@@ -1,0 +1,258 @@
+@import "../bower_components/bootstrap/scss/variables"
+@import "../bower_components/bootstrap/scss/mixins"
+@import "../bower_components/bootstrap/scss/reboot"
+@import "../bower_components/bootstrap/scss/grid"
+
+$cdn: ''
+$base: '#{$cdn}/app/components/slOutlets/images'
+
+.sl-map
+  height: 943px
+
+  +media-breakpoint-down(xs)
+    height: 85vh
+    margin: 0 (-$grid-gutter-width / 2)
+
+  &--wrapper
+    @extend .col-md-8
+
+
+.gm-style-iw
+  //width: 100% !important
+  top: 0!important
+  left: -$grid-gutter-width/2!important
+  right: 0!important
+  padding: 0
+  margin: 0
+  background: transparent
+  overflow: visible !important
+
+  & > div
+    overflow: visible !important
+
+
+=metroIcon($width: 21px, $height: 16px)
+  position: relative
+  display: inline-block
+  left: 0
+  top: .1em
+  margin-right: .25em
+  width: $width
+  height: $height
+  background: url('#{$base}/station_mask_white.png') no-repeat 50% 50%
+  background-size: contain
+
+.sl-outlets
+  $icon: 1.75rem
+  $icon-padding: $icon + .25rem
+  margin-top: 1.5em
+  @extend .row
+
+  .region
+    position: relative
+
+    &--wrapper
+      @extend .col-md-4
+
+    &--current
+      width: 100%
+      position: absolute
+      text-align: center
+
+      &-value
+        text-decoration: underline
+     
+   
+    &--form
+      background: transparent
+      border: none
+      display: block
+      width: 100%
+      -webkit-appearance: none
+      -moz-appearance: none
+      text-overflow: ''
+      text-transform: uppercase
+      opacity: 0
+
+      option
+        text-transform: none
+        opacity: 1
+     
+
+      &::-ms-expand
+        display: none
+ 
+
+  .outlets--wrapper
+    height: 884px
+    overflow-x: hidden
+    overflow-y: scroll
+    margin-right: -3em
+    text-align: left
+
+    +media-breakpoint-down(sm)
+      margin-right: 0
+      height: 100%
+      overflow-y: hidden
+   
+ 
+
+  .outlet-info
+    margin-left: $icon-padding
+    font-size: .75em
+
+    .address
+      font-size: 1.25em
+
+      &_mobile-landscape
+        display: none
+        +media-breakpoint-only(sm)
+          display: inline-block
+   
+    .metro
+      line-height: 1em
+   
+    .hours
+      font-size: 1.1em
+      padding-top: .5em
+   
+
+    .metro--icon
+      +metroIcon()
+   
+ 
+
+  .outlets--view
+    display: none
+    +media-breakpoint-down(sm)
+      display: block
+
+    button
+      background: none
+      border: 0
+      display: inline-block
+      padding: 0 1em
+      line-height: 3em
+
+      &.outlets--view-active
+        color: #fff
+        background: #333
+
+
+  .outlets--search
+    margin: .25em 0
+    position: relative
+
+    input
+      position: relative
+      display: block
+      width: 100%
+      line-height: 2em
+      border: 1px solid #ccc
+      border-left-color: transparent
+      border-right-color: transparent
+      background: transparent
+      transition: border-color 300ms
+      padding: 0 .5em
+      z-index: 10
+
+      &:focus
+        border-color: #bbb
+     
+
+      &:focus + .outlets--search-icon
+        opacity: 0.25
+     
+   
+
+    &-icon
+      position: absolute
+      top: 0
+      left: 0
+      display: block
+      width: 100%
+      height: 100%
+      background: url('#{$base}/search.png') no-repeat 50% 50%
+      transition: opacity 300ms
+      z-index: 1
+   
+
+  .outlet
+    margin: 0 2em 0 0
+    padding: .5em 1em
+    background: transparent
+    cursor: pointer
+    transition: all 300ms
+    border-left: 3px solid transparent
+
+    +media-breakpoint-down(sm)
+      margin-right: 0
+   
+
+    .outlet-title
+      text-transform: uppercase
+      margin-left: $icon-padding
+      position: relative
+
+      &:before
+        position: absolute
+        top: $icon-padding - $icon
+        left: -$icon - .85rem
+        width: $icon
+        height: $icon
+        content: ''
+        background: url('#{$base}/marker_list_grey.png') no-repeat 50% 50%
+        background-size: contain
+        transition: all 300ms
+     
+   
+
+    &:hover
+      .outlet-title:before
+        background-image: url('#{$base}/marker_list.png')
+     
+   
+
+    &.outlet-selected
+      background-color: #eee
+      border-color: red
+
+      .outlet-title:before
+        background-image: url('#{$base}/marker_list_red.png')
+
+      .metro--icon
+        background-image: url('#{$base}/station_mask_grey.png')
+ 
+  .metro
+    font-size: 1.25em
+    line-height: 3rem
+    position: relative
+    top: .25rem
+ 
+
+
+
+.outlet--marker-info
+  height: 10em
+  width: 24em
+  max-width: 75vw
+  //background: #fff
+  display: block
+  margin: .2rem -4em .2rem .2rem
+  font-family: futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif
+  padding: 0 1rem
+
+  h4
+    font-size: 1.5em
+    margin: 1rem 0
+ 
+
+  .address
+    font-size: 1.75rem
+ 
+
+  .hours
+    margin-top: .5rem
+ 
+  .metro .metro--icon
+    +metroIcon()

@@ -1,0 +1,70 @@
+<div class="sl-outlets" map-lazy-load="http://maps.google.com/maps/api/js">
+    <div class="region--wrapper">
+        <div class="region">
+            <div class="region--current">
+                <span>Ваш город:&nbsp;</span>
+                <span ng-bind="slMap.model.location.name" class="region--current-value"></span>
+            </div>
+            <select ng-options="region as region.name for region in slMap.regions track by region.id"
+                    ng-model="slMap.model.location" ng-change="slMap.setRegion()" class="region--form"></select>
+        </div>
+        <div class="outlets--view">
+            <button ng-click="outlets.showcase('list')"
+                    ng-class="{'outlets--view-active': outlets.showcase() === 'list'}">Список
+            </button>
+            <button ng-click="outlets.showcase('map')"
+                    ng-class="{'outlets--view-active': outlets.showcase() === 'map'}">Карта
+            </button>
+        </div>
+        <div class="outlets--search">
+            <input type="text" ng-model="slMap.outletsFilter" ng-change="outlets.bound()"
+                   ng-class="{'outlets--search-filter': slMap.isMobile}"/>
+
+            <div class="outlets--search-icon"></div>
+        </div>
+        <div ng-hide="main.isMobile && outlets.showcase() !== 'list'" class="outlets--wrapper">
+            <div ng-repeat="outlet in slMap.model.outlets | filter: slMap.outletsFilter"
+                 ng-class="{'outlet-selected': outlet.selected}" ng-click="outlets.select(outlet)" class="outlet">
+                <div ng-bind="::outlet.mall" class="outlet-title"></div>
+                <div class="outlet-info">
+                    <div ng-bind="::outlet.address" ng-show="outlet.selected" class="address"></div>
+                    <span class="metro"><span ng-style="{backgroundColor: '#'+ outlet.metros[0].color}"
+                                              class="metro--icon"></span>{{::outlet.metros[0].name}}</span>
+
+                    <div class="hours"><span ng-show="main.isMobile && outlet.selected"
+                                             ng-bind="::current.opening_hours"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-class="{'outlets--showcase_map': outlets.showcase() !== 'map'}" class="sl-map--wrapper">
+        <a name="map"></a>
+        <ng-map height="600" pan-control="true" pan-control-options="{position:'TOP_RIGHT'}" map-type-control="false"
+                zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true"
+                single-info-window="true" street-view-control="false" class="sl-map">
+            <marker ng-repeat="outlet in slMap.model.outlets | filter: slMap.outletsFilter" id="outlet_{{::outlet.id}}"
+                    position="{{::outlet.geo}}" on-click="outlets.openInfo(outlet, outlets)"
+                    icon="{{outlet.icon || 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker.png'}}">
+                <info-window id="info_{{::outlet.id}}" visible="{{outlet.id === current.id}}"
+                             closeclick="outlets.back()">
+                    <div class="outlet--marker-info">
+                        <h4 ng-bind="current.mall"></h4>
+
+                        <div class="address">{{::current.address}}</div>
+                        <div class="metros"><span ng-show="current.metros[0]" class="metro"><span
+                                ng-style="{backgroundColor: '#'+ current.metros[0].color}" class="metro--icon"></span>{{::current.metros[0].name}}</span><span
+                                ng-show="current.metros[1]" class="metro"><span
+                                ng-style="{backgroundColor: '#'+ current.metros[1].color}" class="metro--icon"></span>{{::current.metros[1].name}}</span><span
+                                ng-show="current.metros[2]" class="metro"><span
+                                ng-style="{backgroundColor: '#'+ current.metros[2].color}" class="metro--icon"></span>{{::current.metros[2].name}}</span>
+                        </div>
+                        <div class="hours"><span ng-bind="::current.opening_hours"></span></div>
+                    </div>
+                </info-window>
+            </marker>
+            <!--custom-marker(id="outletCard", position='Russia, Moscow', visible='false')-->
+            <!--  .outletCard-->
+            <!--    p some some some-->
+        </ng-map>
+    </div>
+</div>
