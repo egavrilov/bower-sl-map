@@ -1,10 +1,11 @@
+const mapTpl = require('ngtemplate!html!./map.html');
 class Map {
   constructor() {
     this.scope = true;
     this.bindToController = true;
     this.controller = MapController;
     this.controllerAs = 'slMap';
-    this.templateUrl = './src/map.html';
+    this.templateUrl = mapTpl;
   }
 }
 

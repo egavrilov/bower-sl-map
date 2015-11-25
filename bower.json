@@ -4,7 +4,10 @@
     "huncode <me@huncode.com>"
   ],
   "description": "",
-  "main": "",
+  "main": [
+    "dist/map.js",
+    "dist/map.css"
+  ],
   "moduleType": [
     "es6"
   ],

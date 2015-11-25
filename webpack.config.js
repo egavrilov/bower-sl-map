@@ -6,8 +6,7 @@ module.exports = {
     filename: 'dist/map.js'
   },
   module: {
-    loaders: [
-      {
+    loaders: [{
         test: /\.js$/,
         loaders: ['babel-loader', 'ng-annotate']
       }
