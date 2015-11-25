@@ -12,10 +12,11 @@ class MapController {
   /**
    @ngInject
    */
-  constructor(NgMap, Regions, Outlets, $window, $q) {
+  constructor(NgMap, Regions, Outlets, $timeout, $window, $q) {
     this.NgMap = NgMap;
     this.Regions = Regions;
     this.Outlets = Outlets;
+    this.$timeout = $timeout;
     this.$window = $window;
     this.$q = $q;
     this.model = {};
@@ -31,13 +32,14 @@ class MapController {
       this.regions = responses.regions;
       this.outlets = responses.outlets;
       this.map = responses.map;
+      this.map._controller = this;
       this.model.location = this.Regions.current;
       this.model.outlets = this.outletsByRegion(this.model.location.id);
       this.render();
     });
   }
 
-  outletsByRegion(id){
+  outletsByRegion(id) {
     return this.outlets.filter((_outlet) => _outlet.region_id && _outlet.region_id.indexOf(id) !== -1);
   }
 
@@ -59,9 +61,50 @@ class MapController {
     this.$window.google.maps.event.trigger(this.map, 'resize');
     this.map.fitBounds(this.bounds);
     this.map.panToBounds(this.bounds);
-    if (this.map.zoom > 15 ) this.map.setZoom(15);
+    if (this.map.zoom > 15) this.map.setZoom(15);
   }
 
+  select(outlet) {
+    this.model.outlets.forEach((_outlet) => {
+      _outlet.selected = (_outlet.id === outlet.id);
+    });
+
+    if (this.map.zoom < 15) this.map.setZoom(15);
+    this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
+    this.openInfo(null, outlet);
+  }
+
+  openInfo(event, outlet){
+    const id = outlet.id;
+    const ctrl = event ? this.map._controller : this;
+
+    ctrl.selected = outlet;
+    ctrl.selected.icon = 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker_active.png';
+
+    this.map.showInfoWindow('info', `outlet_${id}`);
+    if (event !== null) {
+      ctrl.select.call(ctrl, outlet);
+      ctrl.$timeout(() => ctrl.scroll.call(ctrl));
+    }
+
+    if (!this.map.singleInfoWindow) return;
+
+    if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
+      this.map.hideInfoWindow('info');
+      this.map.lastInfoWindow.icon = '';
+    }
+
+    this.map.lastInfoWindow = outlet;
+  }
+
+  scroll(){
+    let list = document.querySelector('.outlets--wrapper'); //eslint-disable-line angular/document-service
+    let selected = list.querySelector('.outlet-selected');
+    angular.element(list).animate({
+      scrollTop: selected.offsetTop - selected.offsetHeight
+    });
+    angular.element(document).scrollTop(window.pageYOffset + list.parentNode.getBoundingClientRect().top);  //eslint-disable-line angular/document-service,angular/window-service
+  }
 
   gm(googleMapsMethod) {
     let args = [null].concat(Array.prototype.slice.call(arguments, 1));

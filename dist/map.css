@@ -1045,7 +1045,7 @@ output {
       margin-right: 0.25em;
       width: 21px;
       height: 16px;
-      background: url("/app/components/slOutlets/images/station_mask_white.png") no-repeat 50% 50%;
+      background: url("/src/images/station_mask_white.png") no-repeat 50% 50%;
       background-size: contain; }
   .sl-outlets .outlets--view {
     display: none; }
@@ -1087,7 +1087,7 @@ output {
       display: block;
       width: 100%;
       height: 100%;
-      background: url("/app/components/slOutlets/images/search.png") no-repeat 50% 50%;
+      background: url("/src/images/search.png") no-repeat 50% 50%;
       transition: opacity 300ms;
       z-index: 1; }
   .sl-outlets .outlet {
@@ -1111,18 +1111,18 @@ output {
         width: 1.75rem;
         height: 1.75rem;
         content: "";
-        background: url("/app/components/slOutlets/images/marker_list_grey.png") no-repeat 50% 50%;
+        background: url("/src/images/marker_list_grey.png") no-repeat 50% 50%;
         background-size: contain;
         transition: all 300ms; }
     .sl-outlets .outlet:hover .outlet-title:before {
-      background-image: url("/app/components/slOutlets/images/marker_list.png"); }
+      background-image: url("/src/images/marker_list.png"); }
     .sl-outlets .outlet.outlet-selected {
       background-color: #eee;
       border-color: red; }
       .sl-outlets .outlet.outlet-selected .outlet-title:before {
-        background-image: url("/app/components/slOutlets/images/marker_list_red.png"); }
+        background-image: url("/src/images/marker_list_red.png"); }
       .sl-outlets .outlet.outlet-selected .metro--icon {
-        background-image: url("/app/components/slOutlets/images/station_mask_grey.png"); }
+        background-image: url("/src/images/station_mask_grey.png"); }
   .sl-outlets .metro {
     font-size: 1.25em;
     line-height: 3rem;
@@ -1152,7 +1152,7 @@ output {
     margin-right: 0.25em;
     width: 21px;
     height: 16px;
-    background: url("/app/components/slOutlets/images/station_mask_white.png") no-repeat 50% 50%;
+    background: url("/src/images/station_mask_white.png") no-repeat 50% 50%;
     background-size: contain; }
 
 /*# sourceMappingURL=map.css.map */

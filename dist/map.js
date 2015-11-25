@@ -46,10 +46,6 @@
 
 	'use strict';
 
-	__webpack_require__(1);
-
-	__webpack_require__(2);
-
 	var _map = __webpack_require__(3);
 
 	var _map2 = _interopRequireDefault(_map);
@@ -61,81 +57,8 @@
 	});
 
 /***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	angular.module('sl.regions', []).factory('Regions', /*@ngInject*/["$http", "$q", function ($http, $q) {
-	  var factory = {};
-	  var regions = undefined;
-
-	  factory.fetch = function () {
-	    return $q.all({
-	      location: factory.getLocation(),
-	      regions: factory.getRegions()
-	    }).then(function (responses) {
-	      return responses.regions;
-	    });
-	  };
-
-	  factory.getLocation = function () {
-	    return $http.get('json/location.json').then(function (response) {
-	      var current = response.data.data;
-	      if (!current) return $q.reject('Location not detected');
-
-	      factory.current = {
-	        id: current.region_id,
-	        name: current.region_name
-	      };
-
-	      return current;
-	    });
-	  };
-
-	  factory.getRegions = function () {
-	    return $http.get('json/regions.json').then(function (response) {
-	      if (!response.data) return $q.reject('No regions listed');
-	      regions = response.data.data;
-	      return regions;
-	    });
-	  };
-
-	  factory.setRegion = function (id, retryFlag) {
-	    var region = regions.filter(function (_region) {
-	      return _region.id === id;
-	    })[0];
-	    console.log(region);
-	    if (!region) {
-	      console.warn('No region with such id');
-	      !retryFlag && console.warn('Trying to fetch');
-	      !retryFlag && factory.fetch().then(factory.setRegion.bind(null, id, true));
-	    }
-	    factory.current = region;
-	  };
-
-	  return factory;
-	}]);
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	angular.module('sl.outlets', []).factory('Outlets', /*@ngInject*/["$http", function ($http) {
-	  var factory = {};
-
-	  factory.fetch = function () {
-	    return $http.get('json/outlet.json').then(function (response) {
-	      return response.data.data;
-	    });
-	  };
-
-	  return factory;
-	}]);
-
-/***/ },
+/* 1 */,
+/* 2 */,
 /* 3 */
 /***/ function(module, exports) {
 
@@ -164,12 +87,13 @@
 	   @ngInject
 	   */
 
-	  function MapController(NgMap, Regions, Outlets, $window, $q) {
+	  function MapController(NgMap, Regions, Outlets, $timeout, $window, $q) {
 	    _classCallCheck(this, MapController);
 
 	    this.NgMap = NgMap;
 	    this.Regions = Regions;
 	    this.Outlets = Outlets;
+	    this.$timeout = $timeout;
 	    this.$window = $window;
 	    this.$q = $q;
 	    this.model = {};
@@ -189,6 +113,7 @@
 	        _this.regions = responses.regions;
 	        _this.outlets = responses.outlets;
 	        _this.map = responses.map;
+	        _this.map._controller = _this;
 	        _this.model.location = _this.Regions.current;
 	        _this.model.outlets = _this.outletsByRegion(_this.model.location.id);
 	        _this.render();
@@ -225,6 +150,53 @@
 	      this.map.fitBounds(this.bounds);
 	      this.map.panToBounds(this.bounds);
 	      if (this.map.zoom > 15) this.map.setZoom(15);
+	    }
+	  }, {
+	    key: 'select',
+	    value: function select(outlet) {
+	      this.model.outlets.forEach(function (_outlet) {
+	        _outlet.selected = _outlet.id === outlet.id;
+	      });
+
+	      if (this.map.zoom < 15) this.map.setZoom(15);
+	      this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
+	      this.openInfo(null, outlet);
+	    }
+	  }, {
+	    key: 'openInfo',
+	    value: function openInfo(event, outlet) {
+	      var id = outlet.id;
+	      var ctrl = event ? this.map._controller : this;
+
+	      ctrl.selected = outlet;
+	      ctrl.selected.icon = 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker_active.png';
+
+	      this.map.showInfoWindow('info', 'outlet_' + id);
+	      if (event !== null) {
+	        ctrl.select.call(ctrl, outlet);
+	        ctrl.$timeout(function () {
+	          return ctrl.scroll.call(ctrl);
+	        });
+	      }
+
+	      if (!this.map.singleInfoWindow) return;
+
+	      if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
+	        this.map.hideInfoWindow('info');
+	        this.map.lastInfoWindow.icon = '';
+	      }
+
+	      this.map.lastInfoWindow = outlet;
+	    }
+	  }, {
+	    key: 'scroll',
+	    value: function scroll() {
+	      var list = document.querySelector('.outlets--wrapper'); //eslint-disable-line angular/document-service
+	      var selected = list.querySelector('.outlet-selected');
+	      angular.element(list).animate({
+	        scrollTop: selected.offsetTop - selected.offsetHeight
+	      });
+	      angular.element(document).scrollTop(window.pageYOffset + list.parentNode.getBoundingClientRect().top); //eslint-disable-line angular/document-service,angular/window-service
 	    }
 	  }, {
 	    key: 'gm',
