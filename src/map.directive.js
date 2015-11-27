@@ -22,6 +22,11 @@ class MapController {
     this.$q = $q;
     this.model = {};
     this.init();
+
+    $rootScope.$on('mapShow', (event, outlet) => {
+      this.render();
+      outlet && this.select(outlet);
+    });
   }
 
   init() {
@@ -37,12 +42,6 @@ class MapController {
       this.model.location = this.Regions.current;
       this.model.outlets = this.Outlets.byRegion(this.model.location.id);
       //this.render();
-    });
-
-
-    $rootScope.$on('mapShow', (event, outlet) => {
-      this.render();
-      outlet && this.select(outlet);
     });
   }
 
