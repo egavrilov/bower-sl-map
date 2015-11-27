@@ -24,8 +24,10 @@ class MapController {
     this.init();
 
     $rootScope.$on('mapShow', (event, outlet) => {
-      this.render();
-      this.select(outlet || {});
+      $timeout(() => {
+        this.select(outlet || {id: null});
+        this.render();
+      });
     });
   }
 

@@ -102,8 +102,10 @@
 	    this.init();
 
 	    $rootScope.$on('mapShow', function (event, outlet) {
-	      _this.render();
-	      _this.select(outlet || {});
+	      $timeout(function () {
+	        _this.select(outlet || { id: null });
+	        _this.render();
+	      });
 	    });
 	  }
 
