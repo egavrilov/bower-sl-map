@@ -103,7 +103,7 @@
 
 	    $rootScope.$on('mapShow', function (event, outlet) {
 	      _this.render();
-	      outlet && _this.select(outlet);
+	      _this.select(outlet || {});
 	    });
 	  }
 
@@ -123,7 +123,6 @@
 	        _this2.map._controller = _this2;
 	        _this2.model.location = _this2.Regions.current;
 	        _this2.model.outlets = _this2.Outlets.byRegion(_this2.model.location.id);
-	        //this.render();
 	      });
 	    }
 	  }, {
