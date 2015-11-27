@@ -115,22 +115,15 @@
 	        _this.map = responses.map;
 	        _this.map._controller = _this;
 	        _this.model.location = _this.Regions.current;
-	        _this.model.outlets = _this.outletsByRegion(_this.model.location.id);
+	        _this.model.outlets = _this.Outlets.byRegion(_this.model.location.id);
 	        _this.render();
-	      });
-	    }
-	  }, {
-	    key: 'outletsByRegion',
-	    value: function outletsByRegion(id) {
-	      return this.outlets.filter(function (_outlet) {
-	        return _outlet.region_id && _outlet.region_id.indexOf(id) !== -1;
 	      });
 	    }
 	  }, {
 	    key: 'setRegion',
 	    value: function setRegion() {
 	      if (!this.model.location) return;
-	      this.model.outlets = this.outletsByRegion(this.model.location.id);
+	      this.model.outlets = this.Outlets.byRegion(this.model.location.id);
 	      this.Regions.setRegion(this.model.location.id);
 	      this.render();
 	    }

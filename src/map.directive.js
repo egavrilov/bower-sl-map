@@ -35,18 +35,14 @@ class MapController {
       this.map = responses.map;
       this.map._controller = this;
       this.model.location = this.Regions.current;
-      this.model.outlets = this.outletsByRegion(this.model.location.id);
+      this.model.outlets = this.Outlets.byRegion(this.model.location.id);
       this.render();
     });
   }
 
-  outletsByRegion(id) {
-    return this.outlets.filter((_outlet) => _outlet.region_id && _outlet.region_id.indexOf(id) !== -1);
-  }
-
   setRegion() {
     if (!this.model.location) return;
-    this.model.outlets = this.outletsByRegion(this.model.location.id);
+    this.model.outlets = this.Outlets.byRegion(this.model.location.id);
     this.Regions.setRegion(this.model.location.id);
     this.render();
   }
