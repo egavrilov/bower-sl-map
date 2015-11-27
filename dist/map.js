@@ -88,6 +88,8 @@
 	   */
 
 	  function MapController(NgMap, Regions, Outlets, $timeout, $rootScope, $window, $q) {
+	    var _this = this;
+
 	    _classCallCheck(this, MapController);
 
 	    this.NgMap = NgMap;
@@ -98,30 +100,30 @@
 	    this.$q = $q;
 	    this.model = {};
 	    this.init();
+
+	    $rootScope.$on('mapShow', function (event, outlet) {
+	      _this.render();
+	      outlet && _this.select(outlet);
+	    });
 	  }
 
 	  _createClass(MapController, [{
 	    key: 'init',
 	    value: function init() {
-	      var _this = this;
+	      var _this2 = this;
 
 	      this.$q.all({
 	        regions: this.Regions.fetch(),
 	        outlets: this.Outlets.fetch(),
 	        map: this.NgMap.getMap()
 	      }).then(function (responses) {
-	        _this.regions = responses.regions;
-	        _this.outlets = responses.outlets;
-	        _this.map = responses.map;
-	        _this.map._controller = _this;
-	        _this.model.location = _this.Regions.current;
-	        _this.model.outlets = _this.Outlets.byRegion(_this.model.location.id);
+	        _this2.regions = responses.regions;
+	        _this2.outlets = responses.outlets;
+	        _this2.map = responses.map;
+	        _this2.map._controller = _this2;
+	        _this2.model.location = _this2.Regions.current;
+	        _this2.model.outlets = _this2.Outlets.byRegion(_this2.model.location.id);
 	        //this.render();
-	      });
-
-	      $rootScope.$on('mapShow', function (event, outlet) {
-	        _this.render();
-	        outlet && _this.select(outlet);
 	      });
 	    }
 	  }, {
@@ -135,13 +137,13 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      this.bounds = this.gm('LatLngBounds');
 	      this.model.outlets.forEach(function (outlet) {
 	        if (outlet.geo && outlet.geo.length) {
-	          var marker = _this2.gm('LatLng', outlet.geo[0], outlet.geo[1]);
-	          _this2.bounds.extend(marker);
+	          var marker = _this3.gm('LatLng', outlet.geo[0], outlet.geo[1]);
+	          _this3.bounds.extend(marker);
 	        }
 	      });
 	      this.$window.google.maps.event.trigger(this.map, 'resize');
