@@ -87,7 +87,7 @@
 	   @ngInject
 	   */
 
-	  function MapController(NgMap, Regions, Outlets, $timeout, $window, $q) {
+	  function MapController(NgMap, Regions, Outlets, $timeout, $rootScope, $window, $q) {
 	    _classCallCheck(this, MapController);
 
 	    this.NgMap = NgMap;
@@ -116,7 +116,12 @@
 	        _this.map._controller = _this;
 	        _this.model.location = _this.Regions.current;
 	        _this.model.outlets = _this.Outlets.byRegion(_this.model.location.id);
+	        //this.render();
+	      });
+
+	      $rootScope.$on('mapShow', function (event, outlet) {
 	        _this.render();
+	        outlet && _this.select(outlet);
 	      });
 	    }
 	  }, {

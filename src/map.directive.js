@@ -13,7 +13,7 @@ class MapController {
   /**
    @ngInject
    */
-  constructor(NgMap, Regions, Outlets, $timeout, $window, $q) {
+  constructor(NgMap, Regions, Outlets, $timeout, $rootScope, $window, $q) {
     this.NgMap = NgMap;
     this.Regions = Regions;
     this.Outlets = Outlets;
@@ -36,7 +36,13 @@ class MapController {
       this.map._controller = this;
       this.model.location = this.Regions.current;
       this.model.outlets = this.Outlets.byRegion(this.model.location.id);
+      //this.render();
+    });
+
+
+    $rootScope.$on('mapShow', (event, outlet) => {
       this.render();
+      outlet && this.select(outlet);
     });
   }
 
