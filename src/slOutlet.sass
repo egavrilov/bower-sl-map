@@ -52,6 +52,10 @@ $base: '#{$cdn}/src/images'
 
     &--wrapper
       @extend .col-md-4
+      min-height: 90vh!important
+
+      &.outlets--showcase_map
+        min-height: 0!important
 
     &--current
       width: 100%
@@ -92,7 +96,6 @@ $base: '#{$cdn}/src/images'
     +media-breakpoint-down(sm)
       margin-right: 0
       height: 100%
-      overflow-y: hidden
    
  
 

@@ -24,7 +24,7 @@
     "ngmap": "~1.14.15",
     "angular": "~1.4.8",
     "bootstrap": "~4.0.0-alpha",
-    "outlets": "git@bitbucket.org:egavrilov/bower-sl-outlets.git",
-    "regions": "git@bitbucket.org:egavrilov/bower-sl-regions.git"
+    "sl-outlets": "git@bitbucket.org:egavrilov/bower-sl-outlets.git",
+    "sl-regions": "git@bitbucket.org:egavrilov/bower-sl-regions.git"
   }
 }

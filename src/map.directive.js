@@ -21,6 +21,7 @@ class MapController {
     this.$window = $window;
     this.$q = $q;
     this.model = {};
+    this.isMobile = /android|ip(hone|ad|od)/i.test($window.navigator.userAgent);
     this.init();
 
     $rootScope.$on('mapShow', (event, outlet) => {
@@ -114,6 +115,17 @@ class MapController {
   gm(googleMapsMethod) {
     let args = [null].concat(Array.prototype.slice.call(arguments, 1));
     return new (Function.prototype.bind.apply(this.$window.google.maps[googleMapsMethod], args));
+  }
+
+  showcase(refresh){
+    if (refresh) {
+      this._showcase = refresh;
+      this.$timeout(() => {
+        this.render();
+      });
+    }
+
+    return this._showcase || 'list';
   }
 }
 

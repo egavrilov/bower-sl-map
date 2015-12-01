@@ -1,5 +1,5 @@
 <div class="sl-outlets" map-lazy-load="http://maps.google.com/maps/api/js">
-    <div class="region--wrapper">
+    <div ng-class="{'outlets--showcase_map': slMap.showcase() !== 'list'}" class="region--wrapper">
         <div class="region">
             <div class="region--current">
                 <span>Ваш город:&nbsp;</span>
@@ -8,12 +8,12 @@
             <select ng-options="region as region.name for region in slMap.regions track by region.id"
                     ng-model="slMap.model.location" ng-change="slMap.setRegion()" class="region--form"></select>
         </div>
-        <div class="outlets--view">
-            <button ng-click="outlets.showcase('list')"
-                    ng-class="{'outlets--view-active': outlets.showcase() === 'list'}">Список
+        <div class="outlets--view" ng-if="slMap.isMobile">
+            <button ng-click="slMap.showcase('list')"
+                    ng-class="{'outlets--view-active': slMap.showcase() === 'list'}">Список
             </button>
-            <button ng-click="outlets.showcase('map')"
-                    ng-class="{'outlets--view-active': outlets.showcase() === 'map'}">Карта
+            <button ng-click="slMap.showcase('map')"
+                    ng-class="{'outlets--view-active': slMap.showcase() === 'map'}">Карта
             </button>
         </div>
         <div class="outlets--search">
@@ -22,7 +22,7 @@
 
             <div class="outlets--search-icon"></div>
         </div>
-        <div class="outlets--wrapper">
+        <div class="outlets--wrapper" ng-hide="slMap.isMobile && slMap.showcase() === 'map'">
             <div ng-repeat="outlet in slMap.model.outlets | filter: slMap.outletsFilter"
                  ng-class="{'outlet-selected': outlet.selected}"
                  ng-click="slMap.select(outlet)" class="outlet">
@@ -38,7 +38,7 @@
             </div>
         </div>
     </div>
-    <div ng-class="{'outlets--showcase_map': outlets.showcase() !== 'map'}" class="sl-map--wrapper">
+    <div ng-class="{'outlets--showcase_map': slMap.showcase() !== 'map'}" class="sl-map--wrapper">
         <a name="map"></a>
         <ng-map height="600" pan-control="true" pan-control-options="{position:'TOP_RIGHT'}" map-type-control="false"
                 zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true"

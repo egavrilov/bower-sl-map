@@ -987,6 +987,10 @@ output {
 
 .sl-outlets .region {
   position: relative; }
+  .sl-outlets .region--wrapper {
+    min-height: 90vh !important; }
+    .sl-outlets .region--wrapper.outlets--showcase_map {
+      min-height: 0 !important; }
   .sl-outlets .region--current {
     width: 100%;
     position: absolute;
@@ -1017,8 +1021,7 @@ output {
   @media (max-width: 47.9em) {
     .sl-outlets .outlets--wrapper {
       margin-right: 0;
-      height: 100%;
-      overflow-y: hidden; } }
+      height: 100%; } }
 .sl-outlets .outlet-info {
   margin-left: 2rem;
   font-size: 0.75em; }
