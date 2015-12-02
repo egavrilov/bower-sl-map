@@ -38,7 +38,7 @@
             </div>
         </div>
     </div>
-    <div ng-class="{'outlets--showcase_map': slMap.showcase() !== 'map'}" class="sl-map--wrapper">
+    <div ng-class="{'outlets--showcase_map': slMap.showcase() !== 'map'}" ng-hide="slMap.isMobile && slMap.showcase() === 'list'" class="sl-map--wrapper">
         <a name="map"></a>
         <ng-map height="600" pan-control="true" pan-control-options="{position:'TOP_RIGHT'}" map-type-control="false"
                 zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true"

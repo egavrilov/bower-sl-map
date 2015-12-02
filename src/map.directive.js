@@ -64,6 +64,8 @@ class MapController {
       }
     });
     this.$window.google.maps.event.trigger(this.map, 'resize');
+
+    if (this.selected) return;
     this.map.fitBounds(this.bounds);
     this.map.panToBounds(this.bounds);
     if (this.map.zoom > 15) this.map.setZoom(15);
@@ -74,8 +76,8 @@ class MapController {
       _outlet.selected = (_outlet.id === outlet.id);
     });
 
+    if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
     if(!outlet.id) return;
-    if (this.map.zoom < 15) this.map.setZoom(15);
     this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
     this.openInfo(null, outlet);
   }
@@ -122,6 +124,7 @@ class MapController {
       this._showcase = refresh;
       this.$timeout(() => {
         this.render();
+        this.select();
       });
     }
 
