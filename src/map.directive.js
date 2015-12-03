@@ -30,6 +30,10 @@ class MapController {
         this.render();
       });
     });
+
+    $rootScope.$on('region:change', () => {
+      this.setRegion(true);
+    });
   }
 
   init() {
@@ -48,10 +52,12 @@ class MapController {
     });
   }
 
-  setRegion() {
+  setRegion(externalSet) {
+    this.back();
+    console.log(this.model.location);
     if (!this.model.location) return;
     this.model.outlets = this.Outlets.byRegion(this.model.location.id);
-    this.Regions.setRegion(this.model.location.id);
+    if (!externalSet) this.Regions.setRegion(this.model.location.id);
     this.render();
   }
 
@@ -77,9 +83,17 @@ class MapController {
     });
 
     if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
-    if(!outlet.id) return;
     this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
     this.openInfo(null, outlet);
+  }
+
+  back(){
+    if (this.selected) {
+      this.selected.icon = '';
+      this.selected.selected = false;
+      this.selected = null;
+    }
+    this.map.hideInfoWindow('info');
   }
 
   openInfo(event, outlet){

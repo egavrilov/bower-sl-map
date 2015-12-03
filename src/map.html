@@ -2,7 +2,6 @@
     <div ng-class="{'outlets--showcase_map': slMap.showcase() !== 'list'}" class="region--wrapper">
         <div class="region">
             <div class="region--current">
-                <span>Ваш город:&nbsp;</span>
                 <span ng-bind="slMap.model.location.name" class="region--current-value"></span>
             </div>
             <select ng-options="region as region.name for region in slMap.regions track by region.id"
@@ -28,9 +27,10 @@
                  ng-click="slMap.select(outlet)" class="outlet">
                 <div ng-bind="::outlet.mall" class="outlet-title"></div>
                 <div class="outlet-info">
-                    <div ng-bind="::outlet.address" ng-show="outlet.selected" class="address"></div>
-                    <span class="metro"><span ng-style="{backgroundColor: '#'+ outlet.metros[0].color}"
-                                              class="metro--icon"></span>{{::outlet.metros[0].name}}</span>
+                    <div ng-bind="::outlet.address" ng-show="outlet.selected || !outlet.metros.length" class="address"></div>
+                    <span class="metro"><span ng-show="outlet.metros.length"
+                            ng-style="{backgroundColor: '#'+ outlet.metros[0].color}"
+                            class="metro--icon"></span>{{::outlet.metros[0].name}}</span>
 
                     <div class="hours"><span ng-show="outlet.selected"
                                              ng-bind="::current.opening_hours"></span></div>
@@ -51,7 +51,7 @@
                          closeclick="slMap.back()">
                 <div class="outlet--marker-info" ng-non-bindable="">
                     <h4 ng-bind="slMap.selected.mall"></h4>
-                    <div class="address">{{slMap.selected.address}}</div>
+                    <div class="address" ng-bind="slMap.selected.address"></div>
                     <div class="metros"><span ng-show="slMap.selected.metros[0]" class="metro"><span
                             ng-style="{backgroundColor: '#'+ slMap.selected.metros[0].color}" class="metro--icon"></span>{{slMap.selected.metros[0].name}}</span><span
                             ng-show="slMap.selected.metros[1]" class="metro"><span
