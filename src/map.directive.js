@@ -31,8 +31,9 @@ class MapController {
       });
     });
 
-    $rootScope.$on('region:change', () => {
-      this.setRegion(true);
+    $rootScope.$on('region:change', (event, regionId) => {
+      this.setRegion(regionId, true);
+      this.model.location = Regions.current;
     });
   }
 
@@ -52,11 +53,11 @@ class MapController {
     });
   }
 
-  setRegion(externalSet) {
+  setRegion(regionId, externalSet) {
+    regionId = regionId || this.model.location.id;
     this.back();
-    if (!this.model.location) return;
-    this.model.outlets = this.Outlets.byRegion(this.model.location.id);
-    if (!externalSet) this.Regions.setRegion(this.model.location.id);
+    this.model.outlets = this.Outlets.byRegion(regionId);
+    if (!externalSet) this.Regions.setRegion(regionId);
     this.render();
   }
 

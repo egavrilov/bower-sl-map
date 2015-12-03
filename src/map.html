@@ -5,7 +5,7 @@
                 <span ng-bind="slMap.model.location.name" class="region--current-value"></span>
             </div>
             <select ng-options="region as region.name for region in slMap.regions track by region.id"
-                    ng-model="slMap.model.location" ng-change="slMap.setRegion()" class="region--form"></select>
+                    ng-model="slMap.model.location" ng-change="slMap.setRegion(region.id)" class="region--form"></select>
         </div>
         <div class="outlets--view" ng-if="slMap.isMobile">
             <button ng-click="slMap.showcase('list')"
