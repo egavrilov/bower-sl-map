@@ -54,7 +54,6 @@ class MapController {
 
   setRegion(externalSet) {
     this.back();
-    console.log(this.model.location);
     if (!this.model.location) return;
     this.model.outlets = this.Outlets.byRegion(this.model.location.id);
     if (!externalSet) this.Regions.setRegion(this.model.location.id);
