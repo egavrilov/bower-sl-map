@@ -2,7 +2,9 @@ const mapTpl = require('ngtemplate!html!./map.html');
 class Map {
   constructor() {
     this.scope = true;
-    this.bindToController = true;
+    this.bindToController = {
+      outletsRemains: '@slMapFilter'
+    };
     this.controller = MapController;
     this.controllerAs = 'slMap';
     this.templateUrl = mapTpl;
@@ -48,7 +50,9 @@ class MapController {
       this.map = responses.map;
       this.map._controller = this;
       this.model.location = this.Regions.current;
-      this.model.outlets = this.Outlets.byRegion(this.model.location.id);
+      this.model.outlets = this.outletsRemains ?
+        this.Outlets.byRegion(this.model.location.id).filter(this.filterRemains.bind(this)) :
+        this.Outlets.byRegion(this.model.location.id);
       this.render();
     });
   }
@@ -56,7 +60,9 @@ class MapController {
   setRegion(regionId, externalSet) {
     regionId = regionId || this.model.location.id;
     this.back();
-    this.model.outlets = this.Outlets.byRegion(regionId);
+    this.model.outlets = this.outletsRemains ?
+      this.Outlets.byRegion(regionId).filter(this.filterRemains.bind(this)) :
+      this.Outlets.byRegion(regionId);
     if (!externalSet) this.Regions.setRegion(regionId);
     this.render();
   }
@@ -94,6 +100,10 @@ class MapController {
       this.selected = null;
     }
     this.map.hideInfoWindow('info');
+  }
+
+  filterRemains(outlet){
+    return this.outletsRemains.indexOf(outlet.id) !== -1;
   }
 
   openInfo(event, outlet){

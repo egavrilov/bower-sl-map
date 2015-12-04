@@ -42,7 +42,7 @@
         <a name="map"></a>
         <ng-map height="600" pan-control="true" pan-control-options="{position:'TOP_RIGHT'}" map-type-control="false"
                 zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true"
-                single-info-window="true" street-view-control="false" class="sl-map">
+                single-info-window="true" street-view-control="false" class="sl-map" center="55.755773,37.614608">
             <marker ng-repeat="outlet in slMap.model.outlets | filter: slMap.outletsFilter" id="outlet_{{::outlet.id}}"
                     position="{{::outlet.geo}}" on-click="slMap.openInfo(outlet)"
                     icon="{{outlet.icon || 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker.png'}}">
