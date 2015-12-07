@@ -77,7 +77,8 @@
 
 	  this.scope = true;
 	  this.bindToController = {
-	    outletsRemains: '@slMapFilter'
+	    outletsRemains: '@slMapFilter',
+	    selectedSize: '@slMapRemainsSize'
 	  };
 	  this.controller = MapController;
 	  this.controllerAs = 'slMap';
@@ -102,6 +103,7 @@
 	    this.$q = $q;
 	    this.model = {};
 	    this.isMobile = /android|ip(hone|ad|od)/i.test($window.navigator.userAgent);
+	    this.selectedSize = this.selectedSize || 0;
 	    this.init();
 
 	    $rootScope.$on('mapShow', function (event, outlet) {
@@ -127,14 +129,40 @@
 	        outlets: this.Outlets.fetch(),
 	        map: this.NgMap.getMap()
 	      }).then(function (responses) {
-	        _this2.regions = responses.regions;
+	        _this2.regions = _this2.Regions.all;
 	        _this2.outlets = responses.outlets;
 	        _this2.map = responses.map;
+	        console.log(_this2.map);
+	        _this2.map.width = _this2.$window.outerWidth;
+	        _this2.map.height = _this2.$window.outerHeight;
 	        _this2.map._controller = _this2;
 	        _this2.model.location = _this2.Regions.current;
+	        _this2.outletsRemains = _this2.outletsRemains && angular.fromJson(_this2.outletsRemains);
 	        _this2.model.outlets = _this2.outletsRemains ? _this2.Outlets.byRegion(_this2.model.location.id).filter(_this2.filterRemains.bind(_this2)) : _this2.Outlets.byRegion(_this2.model.location.id);
+	        _this2.remains = _this2.outletsRemains.reduce(function (remains, remain) {
+	          var outlet = _this2.model.outlets.filter(function (_outlet) {
+	            return _outlet.id === remain.outlet_id;
+	          })[0];
+	          if (!outlet || !remain.available && !remain.pickup) {
+	            return remains;
+	          }
+	          if (!remains[remain.size]) {
+	            remains[remain.size] = [];
+	          }
+	          outlet.remains = remain;
+	          remains[remain.size].push(outlet);
+
+	          return remains;
+	        }, {});
+
 	        _this2.render();
 	      });
+	    }
+	  }, {
+	    key: 'pluckSize',
+	    value: function pluckSize(size) {
+	      console.log(this.remains, size, this.selectedSize);
+	      return this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]);
 	    }
 	  }, {
 	    key: 'setRegion',
@@ -167,13 +195,18 @@
 	  }, {
 	    key: 'select',
 	    value: function select(outlet) {
+	      if (!outlet) return;
 	      this.model.outlets.forEach(function (_outlet) {
+	        var equal = _outlet.id === outlet.id;
+	        if (equal) {
+	          _outlet.remains = outlet.remains;
+	        }
 	        _outlet.selected = _outlet.id === outlet.id;
 	      });
 
 	      if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
-	      this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
 	      this.openInfo(null, outlet);
+	      this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
 	    }
 	  }, {
 	    key: 'back',
@@ -181,6 +214,7 @@
 	      if (this.selected) {
 	        this.selected.icon = '';
 	        this.selected.selected = false;
+	        this.selected.remains = null;
 	        this.selected = null;
 	      }
 	      this.map.hideInfoWindow('info');
@@ -188,7 +222,9 @@
 	  }, {
 	    key: 'filterRemains',
 	    value: function filterRemains(outlet) {
-	      return this.outletsRemains.indexOf(outlet.id) !== -1;
+	      return this.outletsRemains.filter(function (_remain) {
+	        return _remain.outlet_id === outlet.id;
+	      }).length;
 	    }
 	  }, {
 	    key: 'openInfo',
@@ -259,7 +295,7 @@
 /***/ function(module, exports) {
 
 	var path = '/home/eagavrilov/WebstormProjects/bower-sl-map/src/map.html';
-	var html = "<div class=\"sl-outlets\" map-lazy-load=\"http://maps.google.com/maps/api/js\">\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'list'}\" class=\"region--wrapper\">\n        <div class=\"region\">\n            <div class=\"region--current\">\n                <span ng-bind=\"slMap.model.location.name\" class=\"region--current-value\"></span>\n            </div>\n            <select ng-options=\"region as region.name for region in slMap.regions track by region.id\"\n                    ng-model=\"slMap.model.location\" ng-change=\"slMap.setRegion(region.id)\" class=\"region--form\"></select>\n        </div>\n        <div class=\"outlets--view\" ng-if=\"slMap.isMobile\">\n            <button ng-click=\"slMap.showcase('list')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'list'}\">Список\n            </button>\n            <button ng-click=\"slMap.showcase('map')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'map'}\">Карта\n            </button>\n        </div>\n        <div class=\"outlets--search\">\n            <input type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\"\n                   ng-class=\"{'outlets--search-filter': slMap.isMobile}\"/>\n\n            <div class=\"outlets--search-icon\"></div>\n        </div>\n        <div class=\"outlets--wrapper\" ng-hide=\"slMap.isMobile && slMap.showcase() === 'map'\">\n            <div ng-repeat=\"outlet in slMap.model.outlets | filter: slMap.outletsFilter\"\n                 ng-class=\"{'outlet-selected': outlet.selected}\"\n                 ng-click=\"slMap.select(outlet)\" class=\"outlet\">\n                <div ng-bind=\"::outlet.mall\" class=\"outlet-title\"></div>\n                <div class=\"outlet-info\">\n                    <div ng-bind=\"::outlet.address\" ng-show=\"outlet.selected || !outlet.metros.length\" class=\"address\"></div>\n                    <span class=\"metro\"><span ng-show=\"outlet.metros.length\"\n                            ng-style=\"{backgroundColor: '#'+ outlet.metros[0].color}\"\n                            class=\"metro--icon\"></span>{{::outlet.metros[0].name}}</span>\n\n                    <div class=\"hours\"><span ng-show=\"outlet.selected\"\n                                             ng-bind=\"::current.opening_hours\"></span></div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'map'}\" ng-hide=\"slMap.isMobile && slMap.showcase() === 'list'\" class=\"sl-map--wrapper\">\n        <a name=\"map\"></a>\n        <ng-map height=\"600\" pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                single-info-window=\"true\" street-view-control=\"false\" class=\"sl-map\" center=\"55.755773,37.614608\">\n            <marker ng-repeat=\"outlet in slMap.model.outlets | filter: slMap.outletsFilter\" id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\" on-click=\"slMap.openInfo(outlet)\"\n                    icon=\"{{outlet.icon || 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker.png'}}\">\n            </marker>\n            <info-window id=\"info\" visible=\"{{slMap.selected}}\"\n                         closeclick=\"slMap.back()\">\n                <div class=\"outlet--marker-info\" ng-non-bindable=\"\">\n                    <h4 ng-bind=\"slMap.selected.mall\"></h4>\n                    <div class=\"address\" ng-bind=\"slMap.selected.address\"></div>\n                    <div class=\"metros\"><span ng-show=\"slMap.selected.metros[0]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[0].color}\" class=\"metro--icon\"></span>{{slMap.selected.metros[0].name}}</span><span\n                            ng-show=\"slMap.selected.metros[1]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[1].color}\" class=\"metro--icon\"></span>{{slMap.selected.metros[1].name}}</span><span\n                            ng-show=\"slMap.selected.metros[2]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[2].color}\" class=\"metro--icon\"></span>{{slMap.selected.metros[2].name}}</span>\n                    </div>\n                    <div class=\"hours\"><span ng-bind=\"::slMap.selected.opening_hours\"></span></div>\n                </div>\n            </info-window>\n        </ng-map>\n    </div>\n</div>\n";
+	var html = "<div class=\"sl-outlets\" map-lazy-load=\"http://maps.google.com/maps/api/js\">\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'list'}\" class=\"region--wrapper\">\n        <div class=\"region\">\n            <div class=\"region--current\">\n                <span ng-bind=\"slMap.model.location.name\" class=\"region--current-value\"></span>\n            </div>\n            <select ng-options=\"region as region.name for region in slMap.regions track by region.id\"\n                    ng-model=\"slMap.model.location\" ng-change=\"slMap.setRegion(region.id)\" class=\"region--form\"></select>\n        </div>\n        <div class=\"outlets--view\" ng-if=\"slMap.isMobile\">\n            <button ng-click=\"slMap.showcase('list')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'list'}\">Список\n            </button>\n            <button ng-click=\"slMap.showcase('map')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'map'}\">Карта\n            </button>\n        </div>\n        <div class=\"outlets--search\">\n            <input type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\"\n                   ng-class=\"{'outlets--search-filter': slMap.isMobile}\"/>\n\n            <div class=\"outlets--search-icon\"></div>\n        </div>\n        <div class=\"outlets--wrapper\" ng-hide=\"slMap.isMobile && slMap.showcase() === 'map'\">\n            <div ng-repeat=\"outlet in slMap.pluckSize() | filter: slMap.outletsFilter | orderBy: 'remains.available'\"\n                 ng-class=\"{'outlet-selected': outlet.selected}\"\n                 ng-click=\"slMap.select(outlet)\" class=\"outlet\">\n                <div ng-bind=\"::outlet.mall\" class=\"outlet-title\"></div>\n                <div class=\"outlet-info\">\n                    <div ng-bind=\"::outlet.address\" ng-show=\"outlet.selected || !outlet.metros.length\" class=\"address\"></div>\n                    <span class=\"metro\"><span ng-show=\"outlet.metros.length\"\n                            ng-style=\"{backgroundColor: '#'+ outlet.metros[0].color}\"\n                            class=\"metro--icon\"></span>{{::outlet.metros[0].name}}</span>\n\n                    <div class=\"hours\"><span ng-show=\"outlet.selected\"\n                                             ng-bind=\"::current.opening_hours\"></span></div>\n                    <div class=\"remains\" ng-if=\"outlet.remains.available\">Сейчас в наличии</div>\n                    <div class=\"remains\" ng-if=\"outlet.remains.pickup\">Доступно <span ng-bind=\"::outlet.remains.pickup\"></span></div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'map'}\" ng-hide=\"slMap.isMobile && slMap.showcase() === 'list'\" class=\"sl-map--wrapper\">\n        <a name=\"map\"></a>\n        <ng-map height=\"600\" pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                single-info-window=\"true\" street-view-control=\"false\" class=\"sl-map\" center=\"55.755773,37.614608\">\n            <marker ng-repeat=\"outlet in slMap.pluckSize() | filter: slMap.outletsFilter\" id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\" on-click=\"slMap.openInfo(outlet)\"\n                    icon=\"{{outlet.icon || 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker.png'}}\">\n            </marker>\n            <info-window id=\"info\" visible=\"{{slMap.selected}}\"\n                         closeclick=\"slMap.back()\">\n                <div class=\"outlet--marker-info\" ng-non-bindable=\"\">\n                    <h4 ng-bind=\"slMap.selected.mall\"></h4>\n                    <div class=\"address\" ng-bind=\"slMap.selected.address\"></div>\n                    <div class=\"metros\"><span ng-show=\"slMap.selected.metros[0]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[0].color}\" class=\"metro--icon\"></span>{{slMap.selected.metros[0].name}}</span><span\n                            ng-show=\"slMap.selected.metros[1]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[1].color}\" class=\"metro--icon\"></span>{{slMap.selected.metros[1].name}}</span><span\n                            ng-show=\"slMap.selected.metros[2]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[2].color}\" class=\"metro--icon\"></span>{{slMap.selected.metros[2].name}}</span>\n                    </div>\n                    <div class=\"remains\" ng-if=\"slMap.selected.remains.available\">Сейчас в наличии</div>\n                    <div class=\"remains\" ng-if=\"slMap.selected.remains.pickup\">Доступно <span ng-bind=\"::slMap.selected.remains.pickup\"></span></div>\n                    <div class=\"hours\">Часы работы <span ng-bind=\"::slMap.selected.opening_hours\"></span></div>\n                </div>\n            </info-window>\n        </ng-map>\n    </div>\n</div>\n";
 	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, html) }]);
 	module.exports = path;
 
