@@ -8,11 +8,12 @@ $base: '#{$cdn}/src/images'
 
 .sl-map
   height: 943px
+  max-height: 90vh
   font-family: futuralightc, futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif
 
   +media-breakpoint-down(xs)
     height: 85vh
-    margin: 0 (-$grid-gutter-width / 2)
+    margin: 0
 
   &--wrapper
     @extend .col-md-8
@@ -49,6 +50,10 @@ $base: '#{$cdn}/src/images'
   $icon-padding: $icon + .25rem
   font-size: 1rem
   @extend .row
+
+  +media-breakpoint-down(sm)
+    padding-top: .5em
+
 
   .region
     position: relative
@@ -116,9 +121,9 @@ $base: '#{$cdn}/src/images'
    
     .metro
       line-height: 1em
-   
-    .hours
-      font-size: 1.1em
+
+    .remains
+      font-size: 1.25em
       padding-top: .5em
    
 
@@ -131,6 +136,7 @@ $base: '#{$cdn}/src/images'
     display: none
     +media-breakpoint-down(sm)
       display: block
+      padding-left: .5em
 
     button
       background: none
@@ -145,8 +151,11 @@ $base: '#{$cdn}/src/images'
 
 
   .outlets--search
-    margin: .25em 0
+    margin: .5em -.5em .5em .5em
     position: relative
+
+    +media-breakpoint-down(sm)
+      margin-right: 1.5em
 
     input
       position: relative
@@ -154,8 +163,8 @@ $base: '#{$cdn}/src/images'
       width: 100%
       line-height: 2em
       border: 1px solid #ccc
-      border-left-color: transparent
-      border-right-color: transparent
+      //border-left-color: transparent
+      //border-right-color: transparent
       background: transparent
       transition: border-color 300ms
       padding: 0 .5em
@@ -183,7 +192,7 @@ $base: '#{$cdn}/src/images'
    
 
   .outlet
-    margin: 0 2em 0 0
+    margin: 0 1em 0 0
     padding: .5em 1em
     background: transparent
     cursor: pointer
@@ -242,6 +251,20 @@ $base: '#{$cdn}/src/images'
   margin: .2rem -4em .2rem .2rem
   font-family: futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif
   padding: 0 1rem
+
+  .outlet--marker-info-button
+    text-transform: uppercase
+    font-size: 1.1em
+    border: 1px solid
+    line-height: 1.5em
+    display: inline-block
+    padding: 0 .5em
+    margin: .5em 0
+    cursor: pointer
+    color: #111
+
+    &:hover
+      color: #444
 
   h4
     font-size: 1.5em

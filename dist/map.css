@@ -969,11 +969,12 @@ output {
     margin-left: 100%; } }
 .sl-map {
   height: 943px;
+  max-height: 90vh;
   font-family: futuralightc, futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif; }
   @media (max-width: 33.9em) {
     .sl-map {
       height: 85vh;
-      margin: 0 -0.9375rem; } }
+      margin: 0; } }
 
 .gm-style-iw {
   top: 0 !important;
@@ -988,6 +989,9 @@ output {
 
 .sl-outlets {
   font-size: 1rem; }
+  @media (max-width: 47.9em) {
+    .sl-outlets {
+      padding-top: 0.5em; } }
   .sl-outlets .region {
     position: relative; }
     .sl-outlets .region--wrapper {
@@ -1038,8 +1042,8 @@ output {
 
     .sl-outlets .outlet-info .metro {
       line-height: 1em; }
-    .sl-outlets .outlet-info .hours {
-      font-size: 1.1em;
+    .sl-outlets .outlet-info .remains {
+      font-size: 1.25em;
       padding-top: 0.5em; }
     .sl-outlets .outlet-info .metro--icon {
       position: relative;
@@ -1055,7 +1059,8 @@ output {
     display: none; }
     @media (max-width: 47.9em) {
       .sl-outlets .outlets--view {
-        display: block; } }
+        display: block;
+        padding-left: 0.5em; } }
     .sl-outlets .outlets--view button {
       background: none;
       border: 0;
@@ -1066,16 +1071,17 @@ output {
         color: #fff;
         background: #333; }
   .sl-outlets .outlets--search {
-    margin: 0.25em 0;
+    margin: 0.5em -0.5em 0.5em 0.5em;
     position: relative; }
+    @media (max-width: 47.9em) {
+      .sl-outlets .outlets--search {
+        margin-right: 1.5em; } }
     .sl-outlets .outlets--search input {
       position: relative;
       display: block;
       width: 100%;
       line-height: 2em;
       border: 1px solid #ccc;
-      border-left-color: transparent;
-      border-right-color: transparent;
       background: transparent;
       transition: border-color 300ms;
       padding: 0 0.5em;
@@ -1095,7 +1101,7 @@ output {
       transition: opacity 300ms;
       z-index: 1; }
   .sl-outlets .outlet {
-    margin: 0 2em 0 0;
+    margin: 0 1em 0 0;
     padding: 0.5em 1em;
     background: transparent;
     cursor: pointer;
@@ -1140,6 +1146,18 @@ output {
   margin: 0.2rem -4em 0.2rem 0.2rem;
   font-family: futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
   padding: 0 1rem; }
+  .outlet--marker-info .outlet--marker-info-button {
+    text-transform: uppercase;
+    font-size: 1.1em;
+    border: 1px solid;
+    line-height: 1.5em;
+    display: inline-block;
+    padding: 0 0.5em;
+    margin: 0.5em 0;
+    cursor: pointer;
+    color: #111; }
+    .outlet--marker-info .outlet--marker-info-button:hover {
+      color: #444; }
   .outlet--marker-info h4 {
     font-size: 1.5em;
     margin: 1rem 0; }

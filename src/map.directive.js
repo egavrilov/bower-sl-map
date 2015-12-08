@@ -26,6 +26,7 @@ class MapController {
     this.model = {};
     this.isMobile = /android|ip(hone|ad|od)/i.test($window.navigator.userAgent);
     this.selectedSize = this.selectedSize || 0;
+    this.center = [55.755773,37.614608];
     this.init();
 
     $rootScope.$on('mapShow', (event, outlet) => {
@@ -50,7 +51,6 @@ class MapController {
       this.regions = this.Regions.all;
       this.outlets = responses.outlets;
       this.map = responses.map;
-      console.log(this.map);
       this.map.width = this.$window.outerWidth;
       this.map.height = this.$window.outerHeight;
       this.map._controller = this;
@@ -78,7 +78,6 @@ class MapController {
   }
 
   pluckSize(size) {
-    console.log(this.remains, size, this.selectedSize);
     return this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]);
   }
 
@@ -118,9 +117,10 @@ class MapController {
       _outlet.selected = (_outlet.id === outlet.id);
     });
 
-    if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
     this.openInfo(null, outlet);
-    this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
+    this.$window.google.maps.event.trigger(this.map, 'resize');
+    this.center = outlet.geo;
+    if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
   }
 
   back() {
