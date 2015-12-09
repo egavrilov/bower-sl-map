@@ -55,30 +55,38 @@ class MapController {
       this.map.height = this.$window.outerHeight;
       this.map._controller = this;
       this.model.location = this.Regions.current;
-      this.outletsRemains = this.outletsRemains && angular.fromJson(this.outletsRemains);
-      this.model.outlets = this.outletsRemains ?
-        this.Outlets.byRegion(this.model.location.id).filter(this.filterRemains.bind(this)) :
-        this.Outlets.byRegion(this.model.location.id);
-      this.remains = this.outletsRemains.reduce((remains, remain) => {
-        let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
-        if (!outlet || !remain.available && !remain.pickup) {
-          return remains;
-        }
-        if (!remains[remain.size]) {
-          remains[remain.size] = [];
-        }
-        outlet.remains = remain;
-        remains[remain.size].push(outlet);
-
-        return remains;
-      }, {});
-
+      this.initRemains();
       this.render();
     });
   }
 
+  initRemains(){
+    this.outletsRemains = this.outletsRemains && angular.fromJson(this.outletsRemains);
+    this.model.outlets = this.outletsRemains ?
+      this.Outlets.byRegion(this.model.location.id).filter(this.filterRemains.bind(this)) :
+      this.Outlets.byRegion(this.model.location.id);
+
+    if(!this.outletsRemains) return;
+
+    this.remains = this.outletsRemains.reduce((remains, remain) => {
+      let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
+      if (!outlet || !remain.available && !remain.pickup) {
+        return remains;
+      }
+      if (!remains[remain.size]) {
+        remains[remain.size] = [];
+      }
+      outlet.remains = remain;
+      remains[remain.size].push(outlet);
+
+      return remains;
+    }, {});
+  }
+
   pluckSize(size) {
-    return this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]);
+    return this.outletsRemains ?
+      this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]) :
+      this.model.outlets;
   }
 
   setRegion(regionId, externalSet) {
@@ -92,6 +100,7 @@ class MapController {
   }
 
   render() {
+    if (!this.model.outlets) return;
     this.bounds = this.gm('LatLngBounds');
     this.model.outlets.forEach((outlet) => {
       if (outlet.geo && outlet.geo.length) {

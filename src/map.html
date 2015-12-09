@@ -71,7 +71,7 @@
                             class="metro--icon"></span>{{slMap.selected.metros[2].name}}</span>
                     </div>
                     <div class="hours">Часы работы <span ng-bind="::slMap.selected.opening_hours"></span></div>
-                    <div class="remains outlet--marker-info-button" ng-click="reserve.openReserveDialog(slMap.selected.remains)">
+                    <div ng-if="slMap.selected.remains" class="remains outlet--marker-info-button" ng-click="reserve.openReserveDialog(slMap.selected.remains)">
                         <div ng-if="slMap.selected.remains.available">Сейчас в наличии</div>
                         <div ng-if="slMap.selected.remains.pickup">Доступно <span ng-bind="::slMap.selected.remains.pickup"></span></div>
                     </div>

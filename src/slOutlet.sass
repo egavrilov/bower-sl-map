@@ -60,7 +60,10 @@ $base: '#{$cdn}/src/images'
 
     &--wrapper
       @extend .col-md-4
+      font-family: futuralightc, futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif
+      max-height: 90vh
       min-height: 90vh!important
+      overflow: hidden
 
       &.outlets--showcase_map
         min-height: 0!important
@@ -95,7 +98,7 @@ $base: '#{$cdn}/src/images'
  
 
   .outlets--wrapper
-    height: 884px
+    height: 826px
     overflow-x: hidden
     overflow-y: scroll
     margin-right: -3em
@@ -109,21 +112,16 @@ $base: '#{$cdn}/src/images'
 
   .outlet-info
     margin-left: $icon-padding
-    font-size: .75em
 
-    .address
-      font-size: 1.25em
-
-      &_mobile-landscape
-        display: none
-        +media-breakpoint-only(sm)
-          display: inline-block
+    .address_mobile-landscape
+      display: none
+      +media-breakpoint-only(sm)
+        display: inline-block
    
     .metro
       line-height: 1em
 
     .remains
-      font-size: 1.25em
       padding-top: .5em
    
 
@@ -238,7 +236,6 @@ $base: '#{$cdn}/src/images'
         background-image: url('#{$base}/station_mask_grey.png')
  
   .metro
-    font-size: 1.25em
     line-height: 3rem
     position: relative
     top: .25rem
@@ -254,7 +251,6 @@ $base: '#{$cdn}/src/images'
 
   .outlet--marker-info-button
     text-transform: uppercase
-    font-size: 1.1em
     border: 1px solid
     line-height: 1.5em
     display: inline-block
@@ -267,12 +263,8 @@ $base: '#{$cdn}/src/images'
       color: #444
 
   h4
-    font-size: 1.5em
+    font-size: 1.25em
     margin: 1rem 0
- 
-
-  .address
-    font-size: 1.25rem
  
 
   .hours

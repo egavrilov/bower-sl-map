@@ -995,7 +995,10 @@ output {
   .sl-outlets .region {
     position: relative; }
     .sl-outlets .region--wrapper {
-      min-height: 90vh !important; }
+      font-family: futuralightc, futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+      max-height: 90vh;
+      min-height: 90vh !important;
+      overflow: hidden; }
       .sl-outlets .region--wrapper.outlets--showcase_map {
         min-height: 0 !important; }
     .sl-outlets .region--current {
@@ -1020,7 +1023,7 @@ output {
       .sl-outlets .region--form::-ms-expand {
         display: none; }
   .sl-outlets .outlets--wrapper {
-    height: 884px;
+    height: 826px;
     overflow-x: hidden;
     overflow-y: scroll;
     margin-right: -3em;
@@ -1030,12 +1033,9 @@ output {
         margin-right: 1em;
         height: 100%; } }
   .sl-outlets .outlet-info {
-    margin-left: 2rem;
-    font-size: 0.75em; }
-    .sl-outlets .outlet-info .address {
-      font-size: 1.25em; }
-      .sl-outlets .outlet-info .address_mobile-landscape {
-        display: none; }
+    margin-left: 2rem; }
+    .sl-outlets .outlet-info .address_mobile-landscape {
+      display: none; }
 @media (min-width: 34em) and (max-width: 47.9em) {
   .sl-outlets .outlet-info .address_mobile-landscape {
     display: inline-block; } }
@@ -1043,7 +1043,6 @@ output {
     .sl-outlets .outlet-info .metro {
       line-height: 1em; }
     .sl-outlets .outlet-info .remains {
-      font-size: 1.25em;
       padding-top: 0.5em; }
     .sl-outlets .outlet-info .metro--icon {
       position: relative;
@@ -1134,7 +1133,6 @@ output {
       .sl-outlets .outlet.outlet-selected .metro--icon {
         background-image: url("/bower_components/sl-map/src/images/station_mask_grey.png"); }
   .sl-outlets .metro {
-    font-size: 1.25em;
     line-height: 3rem;
     position: relative;
     top: 0.25rem; }
@@ -1148,7 +1146,6 @@ output {
   padding: 0 1rem; }
   .outlet--marker-info .outlet--marker-info-button {
     text-transform: uppercase;
-    font-size: 1.1em;
     border: 1px solid;
     line-height: 1.5em;
     display: inline-block;
@@ -1159,10 +1156,8 @@ output {
     .outlet--marker-info .outlet--marker-info-button:hover {
       color: #444; }
   .outlet--marker-info h4 {
-    font-size: 1.5em;
+    font-size: 1.25em;
     margin: 1rem 0; }
-  .outlet--marker-info .address {
-    font-size: 1.25rem; }
   .outlet--marker-info .hours {
     margin-top: 0.5rem; }
   .outlet--marker-info .metro .metro--icon {
