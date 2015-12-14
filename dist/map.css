@@ -1033,7 +1033,8 @@ output {
         margin-right: 1em;
         height: 100%; } }
   .sl-outlets .outlet-info {
-    margin-left: 2rem; }
+    margin-left: 2rem;
+    position: relative; }
     .sl-outlets .outlet-info .address_mobile-landscape {
       display: none; }
 @media (min-width: 34em) and (max-width: 47.9em) {
@@ -1043,7 +1044,18 @@ output {
     .sl-outlets .outlet-info .metro {
       line-height: 1em; }
     .sl-outlets .outlet-info .remains {
-      padding-top: 0.5em; }
+      padding-top: 0.5em;
+      position: absolute;
+      right: 0.5em;
+      bottom: 50%;
+      top: -0.25em; }
+    .sl-outlets .outlet-info .remains-button {
+      border: 1px solid;
+      padding: 4px; }
+      .sl-outlets .outlet-info .remains-button:hover {
+        color: red; }
+    .sl-outlets .outlet-info .metro ~ .remains-button {
+      top: -1.25em; }
     .sl-outlets .outlet-info .metro--icon {
       position: relative;
       display: inline-block;
@@ -1070,7 +1082,8 @@ output {
         color: #fff;
         background: #333; }
   .sl-outlets .outlets--search {
-    margin: 0.5em -0.5em 0.5em 0.5em;
+    margin: 0.5em 0.25em 0.5em 0.5em;
+    left: 0.25em;
     position: relative; }
     @media (max-width: 47.9em) {
       .sl-outlets .outlets--search {
@@ -1109,6 +1122,8 @@ output {
     @media (max-width: 47.9em) {
       .sl-outlets .outlet {
         margin-right: 0; } }
+    .sl-outlets .outlet:last-child {
+      margin-bottom: 2em; }
     .sl-outlets .outlet .outlet-title {
       text-transform: uppercase;
       margin-left: 2rem;
@@ -1132,18 +1147,23 @@ output {
         background-image: url("/bower_components/sl-map/src/images/marker_list_red.png"); }
       .sl-outlets .outlet.outlet-selected .metro--icon {
         background-image: url("/bower_components/sl-map/src/images/station_mask_grey.png"); }
+      .sl-outlets .outlet.outlet-selected .remains {
+        top: -0.75em; }
+      .sl-outlets .outlet.outlet-selected .metro ~ .remains-button {
+        top: -1.75em; }
   .sl-outlets .metro {
-    line-height: 3rem;
     position: relative;
     top: 0.25rem; }
 
 .outlet--marker-info {
-  height: 10em;
   max-width: 75vw;
   display: block;
   margin: 0.2rem -4em 0.2rem 0.2rem;
   font-family: futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
   padding: 0 1rem; }
+  .outlet--marker-info .outlet--marker--buttons {
+    text-align: center; }
   .outlet--marker-info .outlet--marker-info-button {
     text-transform: uppercase;
     border: 1px solid;
@@ -1158,6 +1178,8 @@ output {
   .outlet--marker-info h4 {
     font-size: 1.25em;
     margin: 1rem 0; }
+  .outlet--marker-info div {
+    line-height: 1.5rem; }
   .outlet--marker-info .hours {
     margin-top: 0.5rem; }
   .outlet--marker-info .metro .metro--icon {

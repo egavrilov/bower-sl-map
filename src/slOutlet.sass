@@ -112,6 +112,7 @@ $base: '#{$cdn}/src/images'
 
   .outlet-info
     margin-left: $icon-padding
+    position: relative
 
     .address_mobile-landscape
       display: none
@@ -123,7 +124,20 @@ $base: '#{$cdn}/src/images'
 
     .remains
       padding-top: .5em
-   
+      position: absolute
+      right: .5em
+      bottom: 50%
+      top: -.25em
+
+    .remains-button
+      border: 1px solid
+      padding: 4px
+
+      &:hover
+        color: red
+
+    .metro ~ .remains-button
+      top: -1.25em
 
     .metro--icon
       +metroIcon()
@@ -149,7 +163,8 @@ $base: '#{$cdn}/src/images'
 
 
   .outlets--search
-    margin: .5em -.5em .5em .5em
+    margin: .5em .25em .5em .5em
+    left: .25em
     position: relative
 
     +media-breakpoint-down(sm)
@@ -199,6 +214,9 @@ $base: '#{$cdn}/src/images'
 
     +media-breakpoint-down(sm)
       margin-right: 0
+
+    &:last-child
+      margin-bottom: 2em
    
 
     .outlet-title
@@ -234,20 +252,30 @@ $base: '#{$cdn}/src/images'
 
       .metro--icon
         background-image: url('#{$base}/station_mask_grey.png')
+
+      .remains
+        top: -.75em
+
+      .metro ~ .remains-button
+        top: -1.75em
  
   .metro
-    line-height: 3rem
+    //line-height: 3rem
     position: relative
     top: .25rem
 
 .outlet--marker-info
-  height: 10em
+  //height: 10em
   //width: 24em
   max-width: 75vw
   display: block
   margin: .2rem -4em .2rem .2rem
   font-family: futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif
+  font-size: 1rem
   padding: 0 1rem
+
+  .outlet--marker--buttons
+    text-align: center
 
   .outlet--marker-info-button
     text-transform: uppercase
@@ -265,7 +293,9 @@ $base: '#{$cdn}/src/images'
   h4
     font-size: 1.25em
     margin: 1rem 0
- 
+
+  div
+    line-height: 1.5rem
 
   .hours
     margin-top: .5rem

@@ -25,21 +25,27 @@
         <div class="outlets--wrapper" ng-hide="slMap.isMobile && slMap.showcase() === 'map'">
             <div ng-repeat="outlet in slMap.pluckSize() | filter: slMap.outletsFilter | orderBy: 'remains.available'"
                  ng-class="{'outlet-selected': outlet.selected}"
-                 ng-click="slMap.select(outlet)" class="outlet">
+                 ng-click="!outlet.selected && slMap.select(outlet)" class="outlet">
                 <div ng-bind="::outlet.mall" class="outlet-title"></div>
                 <div class="outlet-info">
                     <div ng-bind="::outlet.address" ng-show="outlet.selected || !outlet.metros.length"
                          class="address"></div>
-                    <span class="metro"><span ng-show="outlet.metros.length"
-                                              ng-style="{backgroundColor: '#'+ outlet.metros[0].color}"
-                                              class="metro--icon"></span>{{::outlet.metros[0].name}}</span>
+                    <span class="metro" ng-if="outlet.metros.length" ng-return="metro in metros">
+                        <span ng-style="{backgroundColor: '#'+ metro.color}" class="metro--icon"></span>
+                        {{::metro.name}}
+                    </span>
 
                     <div class="hours"><span ng-show="outlet.selected"
                                              ng-bind="::current.opening_hours"></span></div>
-                    <div class="remains" ng-if="outlet.remains">
-                        <div ng-if="outlet.remains.available">В наличии</div>
-                        <div ng-if="outlet.remains.pickup">Доступно <span ng-bind="::outlet.remains.pickup"></span>
+                    <div class="remains" ng-if="outlet.remains" ng-click="reserve.openReserveDialog(outlet.remains)">
+                        <div ng-if="!outlet.selected && outlet.remains.available">В наличии</div>
+                        <div ng-if="outlet.selected && outlet.remains.available" class="remains-button">Забрать
+                            сегодня
                         </div>
+                        <div ng-if="!outlet.selected && outlet.remains.pickup">Доступно <span
+                                ng-bind="::outlet.remains.pickup"></span></div>
+                        <div ng-if="outlet.selected && outlet.remains.pickup" class="remains-button">Забрать <span
+                                ng-bind="::outlet.remains.pickup"></span></div>
                     </div>
                 </div>
             </div>
@@ -71,9 +77,11 @@
                             class="metro--icon"></span>{{slMap.selected.metros[2].name}}</span>
                     </div>
                     <div class="hours">Часы работы <span ng-bind="::slMap.selected.opening_hours"></span></div>
-                    <div ng-if="slMap.selected.remains" class="remains outlet--marker-info-button" ng-click="reserve.openReserveDialog(slMap.selected.remains)">
-                        <div ng-if="slMap.selected.remains.available">Сейчас в наличии</div>
-                        <div ng-if="slMap.selected.remains.pickup">Доступно <span ng-bind="::slMap.selected.remains.pickup"></span></div>
+                    <div class="outlet--marker--buttons">
+                        <div ng-if="slMap.selected.remains" class="remains outlet--marker-info-button" ng-click="reserve.openReserveDialog(slMap.selected.remains)">
+                            <div ng-if="slMap.selected.remains.available">Зарезервировать</div>
+                            <div ng-if="slMap.selected.remains.pickup">Доступно <span ng-bind="::slMap.selected.remains.pickup"></span></div>
+                        </div>
                     </div>
                 </div>
             </info-window>
