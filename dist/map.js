@@ -90,7 +90,7 @@
 	   @ngInject
 	   */
 
-	  function MapController(NgMap, Regions, Outlets, $timeout, $rootScope, $window, $q) {
+	  function MapController(NgMap, Regions, Outlets, $scope, $timeout, $rootScope, $window, $q) {
 	    var _this = this;
 
 	    _classCallCheck(this, MapController);
@@ -98,6 +98,7 @@
 	    this.NgMap = NgMap;
 	    this.Regions = Regions;
 	    this.Outlets = Outlets;
+	    this.$scope = $scope;
 	    this.$timeout = $timeout;
 	    this.$window = $window;
 	    this.$q = $q;
@@ -117,6 +118,10 @@
 	    $rootScope.$on('region:change', function (event, regionId) {
 	      _this.setRegion(regionId, true);
 	      _this.model.location = Regions.current;
+	    });
+
+	    angular.element('body').on('click', '.gm-style-iw ~ div', function () {
+	      _this.back();
 	    });
 	  }
 
@@ -205,6 +210,8 @@
 	    key: 'select',
 	    value: function select(outlet) {
 	      if (!outlet) return;
+	      if (outlet.selected) return this.back();
+
 	      this.model.outlets.forEach(function (_outlet) {
 	        var equal = _outlet.id === outlet.id;
 	        if (equal) {
@@ -221,13 +228,17 @@
 	  }, {
 	    key: 'back',
 	    value: function back() {
+	      var _this5 = this;
+
 	      if (this.selected) {
 	        this.selected.icon = '';
 	        this.selected.selected = false;
-	        this.selected.remains = null;
 	        this.selected = null;
 	      }
-	      this.map.hideInfoWindow('info');
+	      this.$scope.$evalAsync(function () {
+	        _this5.map.hideInfoWindow('info');
+	        _this5.render();
+	      });
 	    }
 	  }, {
 	    key: 'filterRemains',
@@ -281,13 +292,13 @@
 	  }, {
 	    key: 'showcase',
 	    value: function showcase(refresh) {
-	      var _this5 = this;
+	      var _this6 = this;
 
 	      if (refresh) {
 	        this._showcase = refresh;
 	        this.$timeout(function () {
-	          _this5.render();
-	          _this5.select();
+	          _this6.render();
+	          _this6.select();
 	        });
 	      }
 
@@ -305,7 +316,7 @@
 /***/ function(module, exports) {
 
 	var path = '/home/eagavrilov/WebstormProjects/bower-sl-map/src/map.html';
-	var html = "<div class=\"sl-outlets\" map-lazy-load=\"http://maps.google.com/maps/api/js\">\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'list'}\" class=\"region--wrapper\">\n        <div class=\"region\">\n            <div class=\"region--current\">\n                <span ng-bind=\"slMap.model.location.name\" class=\"region--current-value\"></span>\n            </div>\n            <select ng-options=\"region as region.name for region in slMap.regions track by region.id\"\n                    ng-model=\"slMap.model.location\" ng-change=\"slMap.setRegion(region.id)\"\n                    class=\"region--form\"></select>\n        </div>\n        <div class=\"outlets--view\" ng-if=\"slMap.isMobile\">\n            <button ng-click=\"slMap.showcase('list')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'list'}\">Список\n            </button>\n            <button ng-click=\"slMap.showcase('map')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'map'}\">Карта\n            </button>\n        </div>\n        <div class=\"outlets--search\">\n            <input type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\"\n                   ng-class=\"{'outlets--search-filter': slMap.isMobile}\"/>\n\n            <div class=\"outlets--search-icon\"></div>\n        </div>\n        <div class=\"outlets--wrapper\" ng-hide=\"slMap.isMobile && slMap.showcase() === 'map'\">\n            <div ng-repeat=\"outlet in slMap.pluckSize() | filter: slMap.outletsFilter | orderBy: 'remains.available'\"\n                 ng-class=\"{'outlet-selected': outlet.selected}\"\n                 ng-click=\"!outlet.selected && slMap.select(outlet)\" class=\"outlet\">\n                <div ng-bind=\"::outlet.mall\" class=\"outlet-title\"></div>\n                <div class=\"outlet-info\">\n                    <div ng-bind=\"::outlet.address\" ng-show=\"outlet.selected || !outlet.metros.length\"\n                         class=\"address\"></div>\n                    <span class=\"metro\" ng-if=\"outlet.metros.length\" ng-return=\"metro in metros\">\n                        <span ng-style=\"{backgroundColor: '#'+ metro.color}\" class=\"metro--icon\"></span>\n                        {{::metro.name}}\n                    </span>\n\n                    <div class=\"hours\"><span ng-show=\"outlet.selected\"\n                                             ng-bind=\"::current.opening_hours\"></span></div>\n                    <div class=\"remains\" ng-if=\"outlet.remains\" ng-click=\"reserve.openReserveDialog(outlet.remains)\">\n                        <div ng-if=\"!outlet.selected && outlet.remains.available\">В наличии</div>\n                        <div ng-if=\"outlet.selected && outlet.remains.available\" class=\"remains-button\">Забрать\n                            сегодня\n                        </div>\n                        <div ng-if=\"!outlet.selected && outlet.remains.pickup\">Доступно <span\n                                ng-bind=\"::outlet.remains.pickup\"></span></div>\n                        <div ng-if=\"outlet.selected && outlet.remains.pickup\" class=\"remains-button\">Забрать <span\n                                ng-bind=\"::outlet.remains.pickup\"></span></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'map'}\"\n         ng-hide=\"slMap.isMobile && slMap.showcase() === 'list'\" class=\"sl-map--wrapper\">\n        <a name=\"map\"></a>\n        <ng-map pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                single-info-window=\"true\" street-view-control=\"false\" class=\"sl-map\" center=\"{{slMap.center}}\">\n            <marker ng-repeat=\"outlet in slMap.pluckSize() | filter: slMap.outletsFilter\" id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\" on-click=\"slMap.openInfo(outlet)\"\n                    icon=\"{{outlet.icon || 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker.png'}}\">\n            </marker>\n            <info-window id=\"info\" visible=\"{{slMap.selected}}\"\n                         closeclick=\"slMap.back()\">\n                <div class=\"outlet--marker-info\" ng-non-bindable=\"\">\n                    <h4 ng-bind=\"slMap.selected.mall\"></h4>\n                    <div class=\"address\" ng-bind=\"slMap.selected.address\"></div>\n                    <div class=\"metros\"><span ng-show=\"slMap.selected.metros[0]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[0].color}\"\n                            class=\"metro--icon\"></span>{{slMap.selected.metros[0].name}}</span><span\n                            ng-show=\"slMap.selected.metros[1]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[1].color}\"\n                            class=\"metro--icon\"></span>{{slMap.selected.metros[1].name}}</span><span\n                            ng-show=\"slMap.selected.metros[2]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[2].color}\"\n                            class=\"metro--icon\"></span>{{slMap.selected.metros[2].name}}</span>\n                    </div>\n                    <div class=\"hours\">Часы работы <span ng-bind=\"::slMap.selected.opening_hours\"></span></div>\n                    <div class=\"outlet--marker--buttons\">\n                        <div ng-if=\"slMap.selected.remains\" class=\"remains outlet--marker-info-button\" ng-click=\"reserve.openReserveDialog(slMap.selected.remains)\">\n                            <div ng-if=\"slMap.selected.remains.available\">Зарезервировать</div>\n                            <div ng-if=\"slMap.selected.remains.pickup\">Доступно <span ng-bind=\"::slMap.selected.remains.pickup\"></span></div>\n                        </div>\n                    </div>\n                </div>\n            </info-window>\n        </ng-map>\n    </div>\n</div>\n";
+	var html = "<div class=\"sl-outlets\" map-lazy-load=\"http://maps.google.com/maps/api/js\">\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'list'}\" class=\"region--wrapper\">\n        <div class=\"region\">\n            <div class=\"region--current\">\n                <span ng-bind=\"slMap.model.location.name\" class=\"region--current-value\"></span>\n            </div>\n            <select ng-options=\"region as region.name for region in slMap.regions track by region.id\"\n                    ng-model=\"slMap.model.location\" ng-change=\"slMap.setRegion(region.id)\"\n                    class=\"region--form\"></select>\n        </div>\n        <div class=\"outlets--view\" ng-if=\"slMap.isMobile\">\n            <button ng-click=\"slMap.showcase('list')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'list'}\">Список\n            </button>\n            <button ng-click=\"slMap.showcase('map')\"\n                    ng-class=\"{'outlets--view-active': slMap.showcase() === 'map'}\">Карта\n            </button>\n        </div>\n        <div class=\"outlets--search\">\n            <input type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\"\n                   ng-class=\"{'outlets--search-filter': slMap.isMobile}\"/>\n\n            <div class=\"outlets--search-icon\"></div>\n        </div>\n        <div class=\"outlets--wrapper\" ng-hide=\"slMap.isMobile && slMap.showcase() === 'map'\">\n            <div ng-repeat=\"outlet in slMap.pluckSize() | filter: slMap.outletsFilter | orderBy: 'remains.available'\"\n                 ng-class=\"{'outlet-selected': outlet.selected}\"\n                 ng-click=\"slMap.select(outlet)\" class=\"outlet\">\n                <div ng-bind=\"::outlet.mall\" class=\"outlet-title\"></div>\n                <div class=\"outlet-info\" ng-class=\"{'outlet-info_remains': outlet.remains}\">\n                    <div ng-bind=\"::outlet.address\" ng-show=\"outlet.selected || !outlet.metros.length\"\n                         class=\"address\"></div>\n                    <span class=\"metro\" ng-if=\"outlet.metros.length\" ng-repeat=\"metro in outlet.metros\">\n                        <span ng-style=\"{backgroundColor: '#'+ metro.color}\" class=\"metro--icon\"></span>\n                        {{::metro.name}}\n                    </span>\n\n                    <div class=\"hours\"><span ng-show=\"outlet.selected\"\n                                             ng-bind=\"::current.opening_hours\"></span></div>\n                    <div class=\"remains\" ng-if=\"outlet.remains\" ng-click=\"reserve.openReserveDialog(outlet.remains); $event.stopPropagation();\">\n                        <div ng-if=\"outlet.remains.available\" class=\"remains-available remains-status\">В наличии</div>\n                        <div ng-if=\"outlet.remains.available\" class=\"remains-available remains-button reserve--button\">Забрать\n                            сегодня\n                        </div>\n                        <div ng-if=\"outlet.remains.pickup\" class=\"remains-pickup remains-status\">Доступно <span\n                                ng-bind=\"::outlet.remains.pickup\"></span></div>\n                        <div ng-if=\"outlet.remains.pickup\" class=\"remains-pickup remains-button\">Забрать <span\n                                ng-bind=\"::outlet.remains.pickup\"></span></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div ng-class=\"{'outlets--showcase_map': slMap.showcase() !== 'map'}\"\n         ng-hide=\"slMap.isMobile && slMap.showcase() === 'list'\" class=\"sl-map--wrapper\">\n        <a name=\"map\"></a>\n        <ng-map pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                single-info-window=\"true\" street-view-control=\"false\" class=\"sl-map\" center=\"{{slMap.center}}\">\n            <marker ng-repeat=\"outlet in slMap.pluckSize() | filter: slMap.outletsFilter\" id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\" on-click=\"slMap.openInfo(outlet)\"\n                    icon=\"{{outlet.icon || 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker.png'}}\">\n            </marker>\n            <info-window id=\"info\" visible=\"{{slMap.selected}}\"\n                         closeclick=\"slMap.back()\">\n                <div class=\"outlet--marker-info\" ng-non-bindable=\"\">\n                    <h4 ng-bind=\"slMap.selected.mall\"></h4>\n                    <div class=\"address\" ng-bind=\"slMap.selected.address\"></div>\n                    <div class=\"metros\"><span ng-show=\"slMap.selected.metros[0]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[0].color}\"\n                            class=\"metro--icon\"></span>{{slMap.selected.metros[0].name}}</span><span\n                            ng-show=\"slMap.selected.metros[1]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[1].color}\"\n                            class=\"metro--icon\"></span>{{slMap.selected.metros[1].name}}</span><span\n                            ng-show=\"slMap.selected.metros[2]\" class=\"metro\"><span\n                            ng-style=\"{backgroundColor: '#'+ slMap.selected.metros[2].color}\"\n                            class=\"metro--icon\"></span>{{slMap.selected.metros[2].name}}</span>\n                    </div>\n                    <div class=\"hours\">Часы работы <span ng-bind=\"::slMap.selected.opening_hours\"></span></div>\n                    <div class=\"outlet--marker--buttons\">\n                        <div ng-if=\"slMap.selected.remains\" class=\"remains outlet--marker-info-button\" ng-click=\"reserve.openReserveDialog(slMap.selected.remains)\">\n                            <div ng-if=\"slMap.selected.remains.available\" class=\"reserve--button\">Зарезервировать</div>\n                            <div ng-if=\"slMap.selected.remains.pickup\" class=\"remains-pickup\">Доступно <span ng-bind=\"::slMap.selected.remains.pickup\"></span></div>\n                        </div>\n                    </div>\n                </div>\n            </info-window>\n        </ng-map>\n    </div>\n</div>\n";
 	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, html) }]);
 	module.exports = path;
 

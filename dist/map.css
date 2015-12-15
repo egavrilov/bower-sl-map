@@ -1032,9 +1032,16 @@ output {
       .sl-outlets .outlets--wrapper {
         margin-right: 1em;
         height: 100%; } }
+  .sl-outlets .outlet:hover .remains-button {
+    display: inline-block; }
+  .sl-outlets .outlet:hover .remains-status {
+    display: none; }
   .sl-outlets .outlet-info {
     margin-left: 2rem;
     position: relative; }
+    @media (max-width: 47.9em) {
+      .sl-outlets .outlet-info {
+        margin-bottom: 0.5rem; } }
     .sl-outlets .outlet-info .address_mobile-landscape {
       display: none; }
 @media (min-width: 34em) and (max-width: 47.9em) {
@@ -1043,19 +1050,6 @@ output {
 
     .sl-outlets .outlet-info .metro {
       line-height: 1em; }
-    .sl-outlets .outlet-info .remains {
-      padding-top: 0.5em;
-      position: absolute;
-      right: 0.5em;
-      bottom: 50%;
-      top: -0.25em; }
-    .sl-outlets .outlet-info .remains-button {
-      border: 1px solid;
-      padding: 4px; }
-      .sl-outlets .outlet-info .remains-button:hover {
-        color: red; }
-    .sl-outlets .outlet-info .metro ~ .remains-button {
-      top: -1.25em; }
     .sl-outlets .outlet-info .metro--icon {
       position: relative;
       display: inline-block;
@@ -1066,6 +1060,33 @@ output {
       height: 16px;
       background: url("/bower_components/sl-map/src/images/station_mask_white.png") no-repeat 50% 50%;
       background-size: contain; }
+  .sl-outlets .outlet-info_remains .remains-button {
+    display: none;
+    border: 1px solid;
+    padding: 4px; }
+    .sl-outlets .outlet-info_remains .remains-button:hover {
+      color: red; }
+  @media (max-width: 47.9em) {
+    .sl-outlets .outlet-info_remains .remains {
+      margin: 0.25em 0 0;
+      top: 0.25em;
+      position: relative;
+      display: inline-block; }
+    .sl-outlets .outlet-info_remains .remains-status {
+      display: none; }
+    .sl-outlets .outlet-info_remains .remains-button {
+      display: inline-block; } }
+  @media (min-width: 48em) {
+    .sl-outlets .outlet-info_remains {
+      margin-right: 8em; }
+      .sl-outlets .outlet-info_remains .remains {
+        padding-top: 0.5em;
+        position: absolute;
+        right: -7.5em;
+        bottom: 50%;
+        top: -1.25em; }
+      .sl-outlets .outlet-info_remains .metro ~ .remains {
+        top: -1.25em; } }
   .sl-outlets .outlets--view {
     display: none; }
     @media (max-width: 47.9em) {
@@ -1087,7 +1108,7 @@ output {
     position: relative; }
     @media (max-width: 47.9em) {
       .sl-outlets .outlets--search {
-        margin-right: 1.5em; } }
+        margin-right: 3.5em; } }
     .sl-outlets .outlets--search input {
       position: relative;
       display: block;
@@ -1147,10 +1168,16 @@ output {
         background-image: url("/bower_components/sl-map/src/images/marker_list_red.png"); }
       .sl-outlets .outlet.outlet-selected .metro--icon {
         background-image: url("/bower_components/sl-map/src/images/station_mask_grey.png"); }
-      .sl-outlets .outlet.outlet-selected .remains {
-        top: -0.75em; }
-      .sl-outlets .outlet.outlet-selected .metro ~ .remains-button {
-        top: -1.75em; }
+      @media (min-width: 48em) {
+        .sl-outlets .outlet.outlet-selected .remains {
+          top: -1.25em; }
+        .sl-outlets .outlet.outlet-selected .remains-button {
+          display: inline-block;
+          color: red; }
+        .sl-outlets .outlet.outlet-selected .remains-status {
+          display: none; }
+        .sl-outlets .outlet.outlet-selected .metro ~ .remains {
+          top: -0.75em; } }
   .sl-outlets .metro {
     position: relative;
     top: 0.25rem; }

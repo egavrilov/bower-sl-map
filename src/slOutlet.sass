@@ -108,11 +108,19 @@ $base: '#{$cdn}/src/images'
       margin-right: 1em
       height: 100%
    
- 
+  .outlet:hover
+    .remains-button
+      display: inline-block
+
+    .remains-status
+      display: none
 
   .outlet-info
     margin-left: $icon-padding
     position: relative
+
+    +media-breakpoint-down(sm)
+      margin-bottom: .5rem
 
     .address_mobile-landscape
       display: none
@@ -122,30 +130,49 @@ $base: '#{$cdn}/src/images'
     .metro
       line-height: 1em
 
-    .remains
-      padding-top: .5em
-      position: absolute
-      right: .5em
-      bottom: 50%
-      top: -.25em
+    .metro--icon
+      +metroIcon()
+
+  .outlet-info_remains
 
     .remains-button
+      display: none
       border: 1px solid
       padding: 4px
 
       &:hover
         color: red
 
-    .metro ~ .remains-button
-      top: -1.25em
+    +media-breakpoint-down(sm)
+      .remains
+        margin: .25em 0 0
+        top: .25em
+        position: relative
+        display: inline-block
 
-    .metro--icon
-      +metroIcon()
-   
- 
+      .remains-status
+        display: none
+
+      .remains-button
+        display: inline-block
+
+    +media-breakpoint-up(md)
+      margin-right: 8em
+
+      .remains
+        padding-top: .5em
+        position: absolute
+        right: -7.5em
+        bottom: 50%
+        top: -1.25em
+
+      .metro ~ .remains
+        top: -1.25em
+
 
   .outlets--view
     display: none
+
     +media-breakpoint-down(sm)
       display: block
       padding-left: .5em
@@ -168,7 +195,7 @@ $base: '#{$cdn}/src/images'
     position: relative
 
     +media-breakpoint-down(sm)
-      margin-right: 1.5em
+      margin-right: 3.5em
 
     input
       position: relative
@@ -189,8 +216,6 @@ $base: '#{$cdn}/src/images'
 
       &:focus + .outlets--search-icon
         opacity: 0.25
-     
-   
 
     &-icon
       position: absolute
@@ -217,7 +242,6 @@ $base: '#{$cdn}/src/images'
 
     &:last-child
       margin-bottom: 2em
-   
 
     .outlet-title
       text-transform: uppercase
@@ -253,11 +277,19 @@ $base: '#{$cdn}/src/images'
       .metro--icon
         background-image: url('#{$base}/station_mask_grey.png')
 
-      .remains
-        top: -.75em
+      +media-breakpoint-up(md)
+        .remains
+          top: -1.25em
 
-      .metro ~ .remains-button
-        top: -1.75em
+        .remains-button
+          display: inline-block
+          color: red
+
+        .remains-status
+          display: none
+
+        .metro ~ .remains
+          top: -0.75em
  
   .metro
     //line-height: 3rem

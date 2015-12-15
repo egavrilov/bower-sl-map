@@ -16,10 +16,11 @@ class MapController {
   /**
    @ngInject
    */
-  constructor(NgMap, Regions, Outlets, $timeout, $rootScope, $window, $q) {
+  constructor(NgMap, Regions, Outlets, $scope, $timeout, $rootScope, $window, $q) {
     this.NgMap = NgMap;
     this.Regions = Regions;
     this.Outlets = Outlets;
+    this.$scope = $scope;
     this.$timeout = $timeout;
     this.$window = $window;
     this.$q = $q;
@@ -39,6 +40,10 @@ class MapController {
     $rootScope.$on('region:change', (event, regionId) => {
       this.setRegion(regionId, true);
       this.model.location = Regions.current;
+    });
+
+    angular.element('body').on('click', '.gm-style-iw ~ div', () => {
+      this.back();
     });
   }
 
@@ -118,6 +123,8 @@ class MapController {
 
   select(outlet) {
     if (!outlet) return;
+    if (outlet.selected)  return this.back();
+
     this.model.outlets.forEach((_outlet) => {
       const equal = _outlet.id === outlet.id;
       if (equal) {
@@ -136,10 +143,12 @@ class MapController {
     if (this.selected) {
       this.selected.icon = '';
       this.selected.selected = false;
-      this.selected.remains = null;
       this.selected = null;
     }
-    this.map.hideInfoWindow('info');
+    this.$scope.$evalAsync(() => {
+      this.map.hideInfoWindow('info');
+      this.render();
+    });
   }
 
   filterRemains(outlet) {
