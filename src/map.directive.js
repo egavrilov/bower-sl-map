@@ -40,6 +40,7 @@ class MapController {
     $rootScope.$on('region:change', (event, regionId) => {
       this.setRegion(regionId, true);
       this.model.location = Regions.current;
+      this.init();
     });
 
     angular.element('body').on('click', '.gm-style-iw ~ div', () => {

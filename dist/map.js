@@ -118,6 +118,7 @@
 	    $rootScope.$on('region:change', function (event, regionId) {
 	      _this.setRegion(regionId, true);
 	      _this.model.location = Regions.current;
+	      _this.init();
 	    });
 
 	    angular.element('body').on('click', '.gm-style-iw ~ div', function () {
