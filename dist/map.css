@@ -1188,6 +1188,7 @@ output {
     top: 0.25rem; }
 
 .outlet--marker-info {
+  width: 24em;
   max-width: 75vw;
   display: block;
   margin: 0.2rem -4em 0.2rem 0.2rem;
@@ -1207,9 +1208,18 @@ output {
     color: #111; }
     .outlet--marker-info .outlet--marker-info-button:hover {
       color: #444; }
-  .outlet--marker-info h4 {
+  .outlet--marker-info .outlet--marker-info-title {
     font-size: 1.25em;
-    margin: 1rem 0; }
+    margin: 1rem 0;
+    text-transform: uppercase;
+    text-align: center; }
+  .outlet--marker-info .outlet--marker-info-mall {
+    font-weight: 700; }
+  .outlet--marker-info .outlet--marker-info-image {
+    margin: 0 -0.25em 0 -1.15em; }
+    .outlet--marker-info .outlet--marker-info-image img {
+      width: 100%;
+      height: auto; }
   .outlet--marker-info div {
     line-height: 1.5rem; }
   .outlet--marker-info .hours {

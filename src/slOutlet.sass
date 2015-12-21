@@ -303,7 +303,7 @@ $base: '#{$cdn}/src/images'
 
 .outlet--marker-info
   //height: 10em
-  //width: 24em
+  width: 24em
   max-width: 75vw
   display: block
   margin: .2rem -4em .2rem .2rem
@@ -327,9 +327,21 @@ $base: '#{$cdn}/src/images'
     &:hover
       color: #444
 
-  h4
+  .outlet--marker-info-title
     font-size: 1.25em
     margin: 1rem 0
+    text-transform: uppercase
+    text-align: center
+
+  .outlet--marker-info-mall
+    font-weight: 700
+
+  .outlet--marker-info-image
+    margin: 0 -.25em 0 -1.15em
+
+    img
+      width: 100%
+      height: auto
 
   div
     line-height: 1.5rem

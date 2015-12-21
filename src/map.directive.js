@@ -204,6 +204,10 @@ class MapController {
 
     return this._showcase || 'list';
   }
+
+  static getPrimary(images){
+    return images.filter((image) => image.is_primary)[0];
+  }
 }
 
 export default Map;

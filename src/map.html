@@ -64,8 +64,13 @@
             <info-window id="info" visible="{{slMap.selected}}"
                          closeclick="slMap.back()">
                 <div class="outlet--marker-info" ng-non-bindable="">
-                    <h4 ng-bind="slMap.selected.mall"></h4>
-                    <div class="address" ng-bind="slMap.selected.address"></div>
+                    <div class="outlet--marker-info-title">
+                        <span class="outlet--marker-info-mall" ng-bind="slMap.selected.mall"></span>
+                        <span ng-bind="slMap.selected.kind.name"></span>
+                    </div>
+                    <div class="outlet--marker-info-image" ng-show="slMap.constructor.getPrimary(slMap.selected.images)">
+                        <img ng-src="{{slMap.constructor.getPrimary(slMap.selected.images).file}}" alt="">
+                    </div>
                     <div class="metros"><span ng-show="slMap.selected.metros[0]" class="metro"><span
                             ng-style="{backgroundColor: '#'+ slMap.selected.metros[0].color}"
                             class="metro--icon"></span>{{slMap.selected.metros[0].name}}</span><span
@@ -76,6 +81,7 @@
                             ng-style="{backgroundColor: '#'+ slMap.selected.metros[2].color}"
                             class="metro--icon"></span>{{slMap.selected.metros[2].name}}</span>
                     </div>
+                    <div class="address" ng-bind="slMap.selected.address"></div>
                     <div class="hours">Часы работы <span ng-bind="::slMap.selected.opening_hours"></span></div>
                     <div class="outlet--marker--buttons">
                         <div ng-if="slMap.selected.remains" class="remains outlet--marker-info-button" ng-click="reserve.openReserveDialog(slMap.selected.remains)">
