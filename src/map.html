@@ -23,10 +23,11 @@
             <div class="outlets--search-icon"></div>
         </div>
         <div class="outlets--wrapper" ng-hide="slMap.isMobile && slMap.showcase() === 'map'">
-            <div ng-repeat="outlet in slMap.pluckSize() | filter: slMap.outletsFilter | orderBy: 'remains.available'"
+            <div ng-repeat="outlet in slMap.pluckSize() | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
                  ng-class="{'outlet-selected': outlet.selected}"
                  ng-click="slMap.select(outlet)" class="outlet">
                 <div ng-bind="::outlet.mall" class="outlet-title"></div>
+                <div ng-bind="::outlet.kind.name" class="outlet-kind"></div>
                 <div class="outlet-info" ng-class="{'outlet-info_remains': outlet.remains}">
                     <div ng-bind="::outlet.address" ng-show="outlet.selected || !outlet.metros.length"
                          class="address"></div>
