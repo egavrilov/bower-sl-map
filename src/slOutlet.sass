@@ -20,9 +20,7 @@ $base: '#{$cdn}/src/images'
 
 
 .gm-style-iw
-  //width: 100% !important
   top: 0!important
-  //left: -$grid-gutter-width/2!important
   left: 0!important
   right: 0!important
   padding: 0
@@ -54,7 +52,6 @@ $base: '#{$cdn}/src/images'
   +media-breakpoint-down(sm)
     padding-top: .5em
 
-
   .region
     position: relative
 
@@ -64,6 +61,10 @@ $base: '#{$cdn}/src/images'
       max-height: 90vh
       min-height: 90vh!important
       overflow: hidden
+
+      +media-breakpoint-down(sm)
+        max-height: unset
+        min-height: unset!important
 
       &.outlets--showcase_map
         min-height: 0!important

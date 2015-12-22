@@ -999,6 +999,10 @@ output {
       max-height: 90vh;
       min-height: 90vh !important;
       overflow: hidden; }
+      @media (max-width: 47.9em) {
+        .sl-outlets .region--wrapper {
+          min-height: unset !important;
+          max-height: unset; } }
       .sl-outlets .region--wrapper.outlets--showcase_map {
         min-height: 0 !important; }
     .sl-outlets .region--current {
