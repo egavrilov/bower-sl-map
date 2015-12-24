@@ -76,7 +76,7 @@ class MapController {
 
     this.remains = this.outletsRemains.reduce((remains, remain) => {
       let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
-      if (!outlet || !remain.available && !remain.pickup) {
+      if (!outlet || !remain.hasOwnProperty('available') && !remain.pickup) {
         return remains;
       }
       if (!remains[remain.size]) {
