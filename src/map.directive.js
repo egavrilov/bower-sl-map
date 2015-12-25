@@ -206,7 +206,7 @@ class MapController {
   }
 
   static getPrimary(images){
-    return images.filter((image) => image.is_primary)[0];
+    return images && images.filter((image) => image.is_primary)[0];
   }
 }
 

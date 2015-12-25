@@ -308,7 +308,7 @@
 	  }], [{
 	    key: 'getPrimary',
 	    value: function getPrimary(images) {
-	      return images.filter(function (image) {
+	      return images && images.filter(function (image) {
 	        return image.is_primary;
 	      })[0];
 	    }
