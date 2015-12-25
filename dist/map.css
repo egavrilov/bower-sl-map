@@ -974,7 +974,8 @@ output {
   @media (max-width: 33.9em) {
     .sl-map {
       height: 85vh;
-      margin: 0; } }
+      margin: 0;
+      padding: 0 0.25em; } }
 
 .gm-style-iw {
   top: 0 !important;
@@ -1001,12 +1002,13 @@ output {
       overflow: hidden; }
       @media (max-width: 47.9em) {
         .sl-outlets .region--wrapper {
-          min-height: unset !important;
-          max-height: unset; } }
+          max-height: unset;
+          min-height: unset !important; } }
       .sl-outlets .region--wrapper.outlets--showcase_map {
         min-height: 0 !important; }
     .sl-outlets .region--current {
       width: 100%;
+      text-transform: uppercase;
       position: absolute;
       text-align: center; }
       .sl-outlets .region--current-value {
@@ -1095,8 +1097,7 @@ output {
     display: none; }
     @media (max-width: 47.9em) {
       .sl-outlets .outlets--view {
-        display: block;
-        padding-left: 0.5em; } }
+        display: block; } }
     .sl-outlets .outlets--view button {
       background: none;
       border: 0;
@@ -1112,7 +1113,8 @@ output {
     position: relative; }
     @media (max-width: 47.9em) {
       .sl-outlets .outlets--search {
-        margin-right: 3.5em; } }
+        margin-right: 0.5em;
+        margin-left: 0; } }
     .sl-outlets .outlets--search input {
       position: relative;
       display: block;

@@ -303,7 +303,7 @@
 	        });
 	      }
 
-	      return this._showcase || 'list';
+	      return this._showcase || 'map';
 	    }
 	  }], [{
 	    key: 'getPrimary',

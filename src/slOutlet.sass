@@ -14,6 +14,7 @@ $base: '#{$cdn}/src/images'
   +media-breakpoint-down(xs)
     height: 85vh
     margin: 0
+    padding: 0 .25em
 
   &--wrapper
     @extend .col-md-8
@@ -71,6 +72,7 @@ $base: '#{$cdn}/src/images'
 
     &--current
       width: 100%
+      text-transform: uppercase
       position: absolute
       text-align: center
 
@@ -176,7 +178,6 @@ $base: '#{$cdn}/src/images'
 
     +media-breakpoint-down(sm)
       display: block
-      padding-left: .5em
 
     button
       background: none
@@ -196,7 +197,8 @@ $base: '#{$cdn}/src/images'
     position: relative
 
     +media-breakpoint-down(sm)
-      margin-right: 3.5em
+      margin-right: 0.5em
+      margin-left: 0
 
     input
       position: relative

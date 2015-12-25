@@ -202,7 +202,7 @@ class MapController {
       });
     }
 
-    return this._showcase || 'list';
+    return this._showcase || 'map';
   }
 
   static getPrimary(images){
