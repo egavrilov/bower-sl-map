@@ -969,25 +969,13 @@ output {
     margin-left: 100%; } }
 .sl-map {
   height: 943px;
-  max-height: 90vh;
+  max-height: 100%;
   font-family: futuralightc, futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif; }
   @media (max-width: 33.9em) {
     .sl-map {
       height: 85vh;
       margin: 0;
       padding: 0 0.25em; } }
-
-.gm-style-iw {
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  padding: 0;
-  margin: 0 3.2em 0 0;
-  background: transparent;
-  overflow: visible !important;
-  width: 311px !important; }
-  .gm-style-iw > div {
-    overflow: visible !important; }
 
 .sl-outlets {
   font-size: 1rem; }
@@ -1065,7 +1053,7 @@ output {
       margin-right: 0.25em;
       width: 21px;
       height: 16px;
-      background: url("/bower_components/sl-map/src/images/station_mask_white.png") no-repeat 50% 50%;
+      background: url("/src/images/station_mask_white.png") no-repeat 50% 50%;
       background-size: contain; }
   .sl-outlets .outlet-info_remains .remains-button {
     display: none;
@@ -1137,7 +1125,7 @@ output {
       display: block;
       width: 100%;
       height: 100%;
-      background: url("/bower_components/sl-map/src/images/search.png") no-repeat 50% 50%;
+      background: url("/src/images/search.png") no-repeat 50% 50%;
       transition: opacity 300ms;
       z-index: 1; }
   .sl-outlets .outlet {
@@ -1164,7 +1152,7 @@ output {
         width: 1.75rem;
         height: 1.75rem;
         content: "";
-        background: url("/bower_components/sl-map/src/images/marker_list_grey.png") no-repeat 50% 50%;
+        background: url("/src/images/marker_list_grey.png") no-repeat 50% 50%;
         background-size: contain;
         transition: all 300ms; }
     .sl-outlets .outlet .outlet-kind {
@@ -1172,14 +1160,14 @@ output {
       text-transform: uppercase;
       font-weight: 100; }
     .sl-outlets .outlet:hover .outlet-title:before {
-      background-image: url("/bower_components/sl-map/src/images/marker_list.png"); }
+      background-image: url("/src/images/marker_list.png"); }
     .sl-outlets .outlet.outlet-selected {
       background-color: #eee;
       border-color: red; }
       .sl-outlets .outlet.outlet-selected .outlet-title:before {
-        background-image: url("/bower_components/sl-map/src/images/marker_list_red.png"); }
+        background-image: url("/src/images/marker_list_red.png"); }
       .sl-outlets .outlet.outlet-selected .metro--icon {
-        background-image: url("/bower_components/sl-map/src/images/station_mask_grey.png"); }
+        background-image: url("/src/images/station_mask_grey.png"); }
       @media (min-width: 48em) {
         .sl-outlets .outlet.outlet-selected .remains {
           top: -1.75em; }
@@ -1194,17 +1182,20 @@ output {
     position: relative;
     top: 0.25rem; }
 
-.outlet--marker-info {
-  width: 24em;
+.outlet-tooltip {
+  background: #ffffff;
+  position: absolute;
+  top: 3%;
+  right: 3%;
   max-width: 75vw;
+  width: 311px;
   display: block;
-  margin: 0.2rem -4em 0.2rem 0.2rem;
   font-family: futurabook, "Helvetica Neue Light", HelveticaNeue-Light, "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
   font-size: 1rem;
-  padding: 0 1rem; }
-  .outlet--marker-info .outlet--marker--buttons {
+  padding: 0 0 1em; }
+  .outlet-tooltip .outlet--marker--buttons {
     text-align: center; }
-  .outlet--marker-info .outlet--marker-info-button {
+  .outlet-tooltip .outlet--marker-info-button {
     text-transform: uppercase;
     border: 1px solid;
     line-height: 1.5em;
@@ -1213,25 +1204,26 @@ output {
     margin: 0.5em 0;
     cursor: pointer;
     color: #111; }
-    .outlet--marker-info .outlet--marker-info-button:hover {
+    .outlet-tooltip .outlet--marker-info-button:hover {
       color: #444; }
-  .outlet--marker-info .outlet--marker-info-title {
+  .outlet-tooltip .outlet--marker-info-title {
     font-size: 1.25em;
     margin: 1rem 0;
     text-transform: uppercase;
     text-align: center; }
-  .outlet--marker-info .outlet--marker-info-mall {
+  .outlet-tooltip .outlet--marker-info-mall {
     font-weight: 700; }
-  .outlet--marker-info .outlet--marker-info-image {
-    margin: 0 -0.25em 0 -1.15em; }
-    .outlet--marker-info .outlet--marker-info-image img {
-      width: 100%;
-      height: auto; }
-  .outlet--marker-info div {
+  .outlet-tooltip .outlet--marker-info-image img {
+    width: 100%;
+    height: auto; }
+  .outlet-tooltip div {
     line-height: 1.5rem; }
-  .outlet--marker-info .hours {
-    margin-top: 0.5rem; }
-  .outlet--marker-info .metro .metro--icon {
+  .outlet-tooltip .address, .outlet-tooltip .hours, .outlet-tooltip .metro {
+    padding: 0 1em 0.25em;
+    max-width: 300px; }
+  .outlet-tooltip .hours {
+    padding: 0 1em; }
+  .outlet-tooltip .metro .metro--icon {
     position: relative;
     display: inline-block;
     left: 0;
@@ -1239,7 +1231,7 @@ output {
     margin-right: 0.25em;
     width: 21px;
     height: 16px;
-    background: url("/bower_components/sl-map/src/images/station_mask_white.png") no-repeat 50% 50%;
+    background: url("/src/images/station_mask_white.png") no-repeat 50% 50%;
     background-size: contain; }
 
 /*# sourceMappingURL=map.css.map */

@@ -3,15 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="dist/map.css">
+    <link rel="stylesheet" href="dist/all.css">
+    <style>
+
+        .wrapper {
+            width: 1204px;
+            height: 600px;
+            max-height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            border: 1px solid;
+            border-width: 1px 0;
+        }
+    </style>
 </head>
 <body>
-<div sl-map></div>
 
+<div class="wrapper">
+    <div class="sl-map" sl-map></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/ngmap/build/scripts/ng-map.js"></script>
-<script src="bower_components/outlets/dist/outlets.js"></script>
-<script src="bower_components/regions/dist/regions.js"></script>
+<script src="bower_components/sl-outlets/dist/outlets.js"></script>
+<script src="bower_components/sl-regions/dist/regions.js"></script>
 <script src="dist/map.js"></script>
 </body>
 </html>

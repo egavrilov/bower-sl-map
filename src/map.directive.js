@@ -66,13 +66,13 @@ class MapController {
     });
   }
 
-  initRemains(){
+  initRemains() {
     this.outletsRemains = this.outletsRemains && angular.fromJson(this.outletsRemains);
     this.model.outlets = this.outletsRemains ?
       this.Outlets.byRegion(this.model.location.id).filter(this.filterRemains.bind(this)) :
       this.Outlets.byRegion(this.model.location.id);
 
-    if(!this.outletsRemains) return;
+    if (!this.outletsRemains) return;
 
     this.remains = this.outletsRemains.reduce((remains, remain) => {
       let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
@@ -124,7 +124,7 @@ class MapController {
 
   select(outlet) {
     if (!outlet) return;
-    if (outlet.selected)  return this.back();
+    if (outlet.selected) return this.back();
 
     this.model.outlets.forEach((_outlet) => {
       const equal = _outlet.id === outlet.id;
@@ -136,7 +136,7 @@ class MapController {
 
     this.openInfo(null, outlet);
     this.$window.google.maps.event.trigger(this.map, 'resize');
-    this.center = outlet.geo;
+    this.center = [outlet.geo[0], outlet.geo[1] + .0125];
     if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
   }
 
@@ -147,7 +147,7 @@ class MapController {
       this.selected = null;
     }
     this.$scope.$evalAsync(() => {
-      this.map.hideInfoWindow('info');
+      //this.map.hideInfoWindow('info');
       this.render();
     });
   }
@@ -157,22 +157,15 @@ class MapController {
   }
 
   openInfo(event, outlet) {
-    const id = outlet.id;
     const ctrl = event ? this.map._controller : this;
 
     ctrl.selected = outlet;
-    ctrl.selected.icon = 'http://cdn1.love.sl/love.sl/common/actions/charm/assets/marker_active.png';
+    ctrl.selected.icon = '/src/images/new/marker-active.png';
 
-    this.map.showInfoWindow('info', `outlet_${id}`);
-    if (event !== null) {
-      ctrl.select.call(ctrl, outlet);
-      ctrl.$timeout(() => ctrl.scroll.call(ctrl));
-    }
-
-    if (!this.map.singleInfoWindow) return;
-
+    //if (!this.map.singleInfoWindow) return;
+    //
     if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
-      this.map.hideInfoWindow('info');
+    //  this.map.hideInfoWindow('info');
       this.map.lastInfoWindow.icon = '';
     }
 
@@ -202,7 +195,7 @@ class MapController {
       });
     }
 
-    return this._showcase || 'map';
+    return this._showcase || this.remains ? 'list' : 'map';
   }
 
   static getPrimary(images){
