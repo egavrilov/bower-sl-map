@@ -1,20 +1,20 @@
 @font-face {
   font-family: 'futurabookcregular';
-  src: url('../fonts/futurabookc-webfont.eot');
-  src: url('../fonts/futurabookc-webfont-.eot#iefix') format('embedded-opentype'),
-  url('../fonts/futurabookc-webfont.woff2') format('woff2'),
-  url('../fonts/futurabookc-webfont.woff') format('woff'),
-  url('../fonts/futurabookc-webfont.ttf') format('truetype');
+  src: url('../src/fonts/futurabookc-webfont.eot');
+  src: url('../src/fonts/futurabookc-webfont-.eot#iefix') format('embedded-opentype'),
+  url('../src/fonts/futurabookc-webfont.woff2') format('woff2'),
+  url('../src/fonts/futurabookc-webfont.woff') format('woff'),
+  url('../src/fonts/futurabookc-webfont.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'FuturaDemiC';
-  src: url('../fonts/FuturaDemiC.eot');
-  src: url('../fonts/FuturaDemiC.eot') format('embedded-opentype'),
-  url('../fonts/FuturaDemiC.woff2') format('woff2'),
-  url('../fonts/FuturaDemiC.woff') format('woff'),
-  url('../fonts/FuturaDemiC.ttf') format('truetype');
+  src: url('../src/fonts/FuturaDemiC.eot');
+  src: url('../src/fonts/FuturaDemiC.eot') format('embedded-opentype'),
+  url('../src/fonts/FuturaDemiC.woff2') format('woff2'),
+  url('../src/fonts/FuturaDemiC.woff') format('woff'),
+  url('../src/fonts/FuturaDemiC.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -191,9 +191,9 @@ ul li {list-style: none;}
   margin: 0;
   border-width: 1px;
   border-color: #e8e8e8;
-  background: #fff url("../images/loupe.png") 50% 50% no-repeat;
+  background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 50% 50% no-repeat;
 }
-.adress-popup .input:focus {background: #fff url("../images/loupe.png") 11px 50% no-repeat;}
+.adress-popup .input:focus {background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 11px 50% no-repeat;}
 .adress-popup-left {
   overflow: hidden;
   float: left;
@@ -268,12 +268,12 @@ ul li {list-style: none;}
   letter-spacing: 2px;
   text-transform: uppercase;
 }
-.adress-popup-name span {font-family: 'FuturaDemiC';}
+.adress-popup-name span:first-child {font-family: 'FuturaDemiC';}
 .adress-popup-street {
   padding: 0 0 0 21px;
   font-size: 1.6em;
   line-height: 20px;
-  background: url("../images/map-icon.png") 2px 2px no-repeat;
+  background: url("http://scr.amik.am/sunlight_adress/images/map-icon.png") 2px 2px no-repeat;
 }
 .adress-popup-time {
   color: #808080;
@@ -284,11 +284,15 @@ ul li {list-style: none;}
   margin: 0 0 9px;
   font-size: 1.6em;
   line-height: 20px;
-  background: url("../images/metro-icon.png") 0 3px no-repeat;
+  background: url("http://scr.amik.am/sunlight_adress/images/metro-icon.png") 0 3px no-repeat;
 }
 .adress-popup-info {
   font-size: 1.3em;
   line-height: 21px;
+  display: none;
+}
+.address-popup-list_remains .adress-popup-info{
+  display: block;
 }
 .adress-popup-status {
   display: inline-block;
@@ -314,9 +318,9 @@ ul li {list-style: none;}
   position: absolute;
   width: 24px;
   height: 32px;
-  background: url("../images/adress-mark.png") 0 0 no-repeat;
+  background: url("http://scr.amik.am/sunlight_adress/images/adress-mark.png") 0 0 no-repeat;
 }
-.adress-mark.active {background: url("../images/adress-mark-active.png") 0 0 no-repeat;}
+.adress-mark.active {background: url("http://scr.amik.am/sunlight_adress/images/adress-mark-active.png") 0 0 no-repeat;}
 .adress-mark1 {
   top: 166px;
   left: 103px;
@@ -434,7 +438,7 @@ ul li {list-style: none;}
   padding: 0 0 0 25px;
   color: #808080;
   text-decoration: none;
-  background: url("../images/form-mail-grey.png") 0 2px no-repeat;
+  background: url("http://scr.amik.am/sunlight_adress/images/form-mail-grey.png") 0 2px no-repeat;
 }
 .min-popup-form {
   width: 236px;
@@ -455,9 +459,9 @@ ul li {list-style: none;}
   color: #000;
   border: 1px solid #f00;
 }
-.input-phone {background: url("../images/form-phone.png") 11px 50% no-repeat;}
-.input-code {background: url("../images/form-code.png") 11px 50% no-repeat;}
-.input-mail {background: url("../images/form-mail.png") 11px 50% no-repeat;}
+.input-phone {background: url("http://scr.amik.am/sunlight_adress/images/form-phone.png") 11px 50% no-repeat;}
+.input-code {background: url("http://scr.amik.am/sunlight_adress/images/form-code.png") 11px 50% no-repeat;}
+.input-mail {background: url("http://scr.amik.am/sunlight_adress/images/form-mail.png") 11px 50% no-repeat;}
 .min-popup .submit {
   font-size: 1.6em;
   letter-spacing: 1px;

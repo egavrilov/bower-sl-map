@@ -61,6 +61,8 @@ class MapController {
       this.map.height = this.$window.outerHeight;
       this.map._controller = this;
       this.model.location = this.Regions.current;
+
+      console.log(this.Outlets);
       this.initRemains();
       this.render();
     });
@@ -90,6 +92,7 @@ class MapController {
   }
 
   pluckSize(size) {
+    if (!this.map) return;
     return this.outletsRemains ?
       this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]) :
       this.model.outlets;
@@ -125,6 +128,7 @@ class MapController {
   select(outlet) {
     if (!outlet) return;
     if (outlet.selected) return this.back();
+    console.log(outlet);
 
     this.model.outlets.forEach((_outlet) => {
       const equal = _outlet.id === outlet.id;
@@ -136,7 +140,7 @@ class MapController {
 
     this.openInfo(null, outlet);
     this.$window.google.maps.event.trigger(this.map, 'resize');
-    this.center = [outlet.geo[0], outlet.geo[1] + .0125];
+    this.center = [outlet.geo[0], outlet.geo[1] + .0075];
     if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
   }
 
@@ -157,7 +161,9 @@ class MapController {
   }
 
   openInfo(event, outlet) {
+    console.log(arguments);
     const ctrl = event ? this.map._controller : this;
+    ctrl.scroll();
 
     ctrl.selected = outlet;
     ctrl.selected.icon = '/src/images/new/marker-active.png';
@@ -173,7 +179,7 @@ class MapController {
   }
 
   scroll() {
-    let list = document.querySelector('.outlets--wrapper'); //eslint-disable-line angular/document-service
+    let list = document.querySelector('.adress-popup-list'); //eslint-disable-line angular/document-service
     let selected = list.querySelector('.outlet-selected');
     angular.element(list).animate({
       scrollTop: selected.offsetTop - selected.offsetHeight
