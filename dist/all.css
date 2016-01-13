@@ -380,6 +380,7 @@ ul li {list-style: none;}
 
 .adress-popup-box-img img {
   max-width: 100%;
+  height: auto;
 }
 .search-close {
   position: absolute;
