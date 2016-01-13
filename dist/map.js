@@ -90,6 +90,16 @@
 	   @ngInject
 	   */
 
+	  /*
+	      - запрос точек по региону при ините
+	    - отрисовка точек по всей россии
+	    - добавление точек по региону в список справа
+	    - при поиске по названию/адресу - поиск среди всех точек по РФ
+	    - при выборе точки показывать список ТТ региона (если поле поиска пустое) или оставлять найденные ТТ (если заполнено поле поиска)
+	    - при зуме (и отсутствии выбранной точки) показывать точки которые находятся на карте
+	    - если включены остатки, показывать остатки по региону, когда увеличиваем зум и попадаем на точки другого региона - добавляем к ним остатки запросом в батч
+	    */
+
 	  function MapController(NgMap, Regions, Outlets, $scope, $timeout, $rootScope, $window, $q) {
 	    var _this = this;
 
@@ -105,7 +115,6 @@
 	    this.model = {};
 	    this.isMobile = /android|ip(hone|ad|od)/i.test($window.navigator.userAgent);
 	    this.selectedSize = this.selectedSize || 0;
-	    this.center = [55.755773, 37.614608];
 	    this.init();
 
 	    $rootScope.$on('mapShow', function (event, outlet) {
@@ -119,10 +128,6 @@
 	      _this.setRegion(regionId, true);
 	      _this.model.location = Regions.current;
 	      _this.init();
-	    });
-
-	    angular.element('body').on('click', '.gm-style-iw ~ div', function () {
-	      _this.back();
 	    });
 	  }
 
@@ -144,7 +149,6 @@
 	        _this2.map._controller = _this2;
 	        _this2.model.location = _this2.Regions.current;
 
-	        console.log(_this2.Outlets);
 	        _this2.initRemains();
 	        _this2.render();
 	      });
@@ -179,7 +183,16 @@
 	    key: 'pluckSize',
 	    value: function pluckSize(size) {
 	      if (!this.map) return;
-	      return this.outletsRemains ? this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]) : this.model.outlets;
+
+	      if (this.outletsFilter) {
+	        return this.outlets;
+	      }
+
+	      if (this.outletsRemains) {
+	        return this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]);
+	      }
+
+	      return this.model.outlets;
 	    }
 	  }, {
 	    key: 'setRegion',
@@ -215,9 +228,8 @@
 	    value: function select(outlet) {
 	      if (!outlet) return;
 	      if (outlet.selected) return this.back();
-	      console.log(outlet);
 
-	      this.model.outlets.forEach(function (_outlet) {
+	      this.outlets.forEach(function (_outlet) {
 	        var equal = _outlet.id === outlet.id;
 	        if (equal) {
 	          _outlet.remains = outlet.remains;
@@ -225,25 +237,20 @@
 	        _outlet.selected = _outlet.id === outlet.id;
 	      });
 
-	      this.openInfo(null, outlet);
+	      this.openInfo(outlet);
 	      this.$window.google.maps.event.trigger(this.map, 'resize');
-	      this.center = [outlet.geo[0], outlet.geo[1] + .0075];
+	      this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1] + .0075));
 	      if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
 	    }
 	  }, {
 	    key: 'back',
 	    value: function back() {
-	      var _this5 = this;
-
 	      if (this.selected) {
 	        this.selected.icon = '';
 	        this.selected.selected = false;
 	        this.selected = null;
 	      }
-	      this.$scope.$evalAsync(function () {
-	        //this.map.hideInfoWindow('info');
-	        _this5.render();
-	      });
+	      this.$scope.$evalAsync(this.render.bind(this));
 	    }
 	  }, {
 	    key: 'filterRemains',
@@ -254,18 +261,16 @@
 	    }
 	  }, {
 	    key: 'openInfo',
-	    value: function openInfo(event, outlet) {
-	      console.log(arguments);
-	      var ctrl = event ? this.map._controller : this;
-	      ctrl.scroll();
+	    value: function openInfo(outlet) {
+	      var _this5 = this;
 
-	      ctrl.selected = outlet;
-	      ctrl.selected.icon = '/src/images/new/marker-active.png';
+	      this.selected = outlet;
+	      this.selected.icon = '/src/images/new/marker-active.png';
+	      this.$timeout(function () {
+	        return _this5.scroll();
+	      });
 
-	      //if (!this.map.singleInfoWindow) return;
-	      //
 	      if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
-	        //  this.map.hideInfoWindow('info');
 	        this.map.lastInfoWindow.icon = '';
 	      }
 
@@ -275,7 +280,12 @@
 	    key: 'scroll',
 	    value: function scroll() {
 	      var list = document.querySelector('.adress-popup-list'); //eslint-disable-line angular/document-service
-	      var selected = list.querySelector('.outlet-selected');
+	      var selected = list.querySelector('.active');
+
+	      if (!selected) {
+	        return;
+	      }
+
 	      angular.element(list).animate({
 	        scrollTop: selected.offsetTop - selected.offsetHeight
 	      });
@@ -302,6 +312,12 @@
 
 	      return this._showcase || this.remains ? 'list' : 'map';
 	    }
+	  }, {
+	    key: 'proxify',
+	    value: function proxify(event, method, outlet) {
+	      var ctrl = this.map._controller;
+	      ctrl[method].call(ctrl, outlet);
+	    }
 	  }], [{
 	    key: 'getPrimary',
 	    value: function getPrimary(images) {
@@ -321,7 +337,7 @@
 /***/ function(module, exports) {
 
 	var path = '/home/eagavrilov/WebstormProjects/bower-sl-map/src/map.html';
-	var html = "<div class=\"adress-popup\" map-lazy-load=\"http://maps.google.com/maps/api/js\" ng-init=\"slMap.init()\">\n    <a href=\"\" class=\"adress-popup-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n    <a href=\"\" class=\"search-icon\"><img src=\"/src/images/all/loupe-icon.png\" alt=\"\"></a>\n    <div class=\"adress-popup-left active\">\n        <h3 class=\"adress-popup-title\">Где забрать?</h3>\n        <div class=\"adress-popup-tabs\">\n            <a href=\"\" class=\"adress-tab adress-tab-list active\">Список</a>\n            <a href=\"\" class=\"adress-tab adress-tab-map\">НА КАРТЕ</a>\n        </div>\n        <div class=\"adress-popup-search\">\n            <input class=\"input adress-popup-input\" type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\">\n        </div>\n        <div class=\"adress-popup-list address-popup-list_remains\">\n            <div ng-repeat=\"outlet in slMap.pluckSize() | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']\"\n                 ng-class=\"{'outlet-selected': outlet.selected}\"\n                 ng-click=\"slMap.select(outlet)\"\n                 class=\"adress-popup-item adress-popup-item1\">\n                <div class=\"adress-popup-name\"><span ng-bind=\"::outlet.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"::outlet.kind.name\">гипермаркет</span></div>\n                <div class=\"adress-popup-street\">\n                    <span ng-bind=\"::outlet.address\">Москва, улица Арбат, 12 с 1</span>\n                    <div class=\"adress-popup-time\" ng-bind=\"::outlet.opening_hours\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in ::outlet.metros\">\n                    <span ng-bind=\"metro.name\">Электрозаводская</span>\n                </div>\n                <div class=\"adress-popup-info\" ng-if=\"::outlet.remains\">\n                    <span class=\"adress-popup-status adress-popup-status-green\" ng-if=\"::outlet.remains.available\">В наличии</span>\n                    <span class=\"adress-popup-status\" ng-if=\"::outlet.remains.pickup\">Под заказ</span>\n                    <span ng-if=\"::outlet.remains.available !== false\">Можно забрать <span ng-bind=\"::outlet.remains.pickup || 'сегодня'\"></span></span>\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <!--<div class=\"adress-popup-item adress-popup-item2 active\" data-mark=\"adress-mark2\" data-box=\"adress-box2\">\n                <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <div class=\"adress-popup-item adress-popup-item3\" data-mark=\"adress-mark3\" data-box=\"adress-box3\">\n                <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>-->\n        </div>\n    </div>\n    <div class=\"adress-popup-right\">\n        <ng-map class=\"adress-popup-map\" pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\" height=\"100%\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                single-info-window=\"true\" street-view-control=\"false\" center=\"{{slMap.center}}\">\n            <!--<img src=\"/src/images/all/popup-map.jpg\" alt=\"\" class=\"adress-popup-map-img\">-->\n            <a href=\"\" class=\"adress-mark adress-mark1\" data-item=\"adress-popup-item1\" data-box=\"adress-box1\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark2 active\" data-item=\"adress-popup-item2\" data-box=\"adress-box2\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark3\" data-item=\"adress-popup-item3\" data-box=\"adress-box3\"></a>\n            <marker ng-repeat=\"outlet in slMap.outlets | filter: slMap.outletsFilter\"\n                    id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\"\n                    on-click=\"slMap.openInfo(outlet)\"\n                    icon=\"{{outlet.icon || '/src/images/new/marker.png'}}\">\n            </marker>\n        </ng-map>\n    </div>\n    <div class=\"adress-popup-box-holder\" ng-if=\"slMap.selected\">\n        <div class=\"adress-popup-box active\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span ng-bind=\"slMap.selected.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"slMap.selected.kind.name\">гипермаркет</span></div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Москва, улица Арбат, 12 с 1\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать 24 сентября\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <!--<div class=\"adress-popup-box adress-box2 active\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <div class=\"adress-popup-box adress-box3\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>-->\n    </div>\n</div>\n";
+	var html = "<div class=\"loader\" ng-show=\"!slMap.map\"></div>\n<div class=\"adress-popup\" map-lazy-load=\"http://maps.google.com/maps/api/js\" ng-init=\"slMap.init()\">\n    <a href=\"\" class=\"adress-popup-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n    <a href=\"\" class=\"search-icon\"><img src=\"/src/images/all/loupe-icon.png\" alt=\"\"></a>\n    <div class=\"adress-popup-left active\">\n        <h3 class=\"adress-popup-title\">Где забрать?</h3>\n        <div class=\"adress-popup-tabs\">\n            <a href=\"\" class=\"adress-tab adress-tab-list active\">Список</a>\n            <a href=\"\" class=\"adress-tab adress-tab-map\">НА КАРТЕ</a>\n        </div>\n        <div class=\"adress-popup-search\">\n            <input class=\"input adress-popup-input\" type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\">\n        </div>\n        <div class=\"adress-popup-list\">\n            <div ng-repeat=\"outlet in slMap.pluckSize() |filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']\"\n                 ng-class=\"{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }\"\n                 ng-click=\"slMap.select(outlet)\"\n                 class=\"adress-popup-item\">\n                <div class=\"adress-popup-name\"><span ng-bind=\"::outlet.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"::outlet.kind.name\">гипермаркет</span></div>\n                <div class=\"adress-popup-street\">\n                    <span ng-bind=\"::outlet.address\">Москва, улица Арбат, 12 с 1</span>\n                    <div class=\"adress-popup-time\" ng-bind=\"::outlet.opening_hours\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in ::outlet.metros\">\n                    <span ng-bind=\"metro.name\">Электрозаводская</span>\n                </div>\n                <div class=\"adress-popup-info\" ng-if=\"::outlet.remains\">\n                    <span class=\"adress-popup-status adress-popup-status-green\" ng-if=\"::outlet.remains.available\">В наличии</span>\n                    <span class=\"adress-popup-status\" ng-if=\"::outlet.remains.pickup\">Под заказ</span>\n                    <span ng-if=\"::outlet.remains.available !== false\">Можно забрать <span ng-bind=\"::outlet.remains.pickup || 'сегодня'\"></span></span>\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <!--<div class=\"adress-popup-item adress-popup-item2 active\" data-mark=\"adress-mark2\" data-box=\"adress-box2\">\n                <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <div class=\"adress-popup-item adress-popup-item3\" data-mark=\"adress-mark3\" data-box=\"adress-box3\">\n                <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>-->\n        </div>\n    </div>\n    <div class=\"adress-popup-right\">\n        <ng-map class=\"adress-popup-map\" pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\" height=\"100%\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                single-info-window=\"true\" street-view-control=\"false\" center=\"[55.755773, 37.614608]\">\n            <!--<img src=\"/src/images/all/popup-map.jpg\" alt=\"\" class=\"adress-popup-map-img\">-->\n            <a href=\"\" class=\"adress-mark adress-mark1\" data-item=\"adress-popup-item1\" data-box=\"adress-box1\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark2 active\" data-item=\"adress-popup-item2\" data-box=\"adress-box2\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark3\" data-item=\"adress-popup-item3\" data-box=\"adress-box3\"></a>\n            <marker ng-repeat=\"outlet in slMap.outlets | filter: slMap.outletsFilter\"\n                    id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\"\n                    on-click=\"slMap.proxify('select', outlet)\"\n                    icon=\"{{outlet.icon || '/src/images/new/marker.png'}}\">\n            </marker>\n        </ng-map>\n    </div>\n    <div class=\"adress-popup-box-holder\" ng-if=\"slMap.selected\">\n        <div class=\"adress-popup-box active\">\n            <a href=\"\" class=\"adress-box-back\" ng-show=\"slMap.isMobile\" ng-click=\"slMap.back()\" ><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\" ng-click=\"slMap.back()\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span ng-bind=\"slMap.selected.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"slMap.selected.kind.name\">гипермаркет</span></div>\n            <div class=\"adress-popup-box-img\" ng-show=\"slMap.constructor.getPrimary(slMap.selected.images)\">\n                <img ng-src=\"{{slMap.constructor.getPrimary(slMap.selected.images).file}}\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\" ng-bind=\"slMap.selected.address\">\n                    Москва, улица Арбат, 12 с 1\n                    <div class=\"adress-popup-time\" ng-bind=\"slMap.selected.opening_hours\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in slMap.selected.metros\" ng-bind=\"metro.name\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать 24 сентября\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <!--<div class=\"adress-popup-box adress-box2 active\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <div class=\"adress-popup-box adress-box3\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>-->\n    </div>\n</div>\n";
 	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, html) }]);
 	module.exports = path;
 

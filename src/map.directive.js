@@ -16,6 +16,19 @@ class MapController {
   /**
    @ngInject
    */
+
+  /*
+
+
+    - запрос точек по региону при ините
+    - отрисовка точек по всей россии
+    - добавление точек по региону в список справа
+    - при поиске по названию/адресу - поиск среди всех точек по РФ
+    - при выборе точки показывать список ТТ региона (если поле поиска пустое) или оставлять найденные ТТ (если заполнено поле поиска)
+    - при зуме (и отсутствии выбранной точки) показывать точки которые находятся на карте
+    - если включены остатки, показывать остатки по региону, когда увеличиваем зум и попадаем на точки другого региона - добавляем к ним остатки запросом в батч
+
+   */
   constructor(NgMap, Regions, Outlets, $scope, $timeout, $rootScope, $window, $q) {
     this.NgMap = NgMap;
     this.Regions = Regions;
@@ -27,7 +40,6 @@ class MapController {
     this.model = {};
     this.isMobile = /android|ip(hone|ad|od)/i.test($window.navigator.userAgent);
     this.selectedSize = this.selectedSize || 0;
-    this.center = [55.755773,37.614608];
     this.init();
 
     $rootScope.$on('mapShow', (event, outlet) => {
@@ -41,10 +53,6 @@ class MapController {
       this.setRegion(regionId, true);
       this.model.location = Regions.current;
       this.init();
-    });
-
-    angular.element('body').on('click', '.gm-style-iw ~ div', () => {
-      this.back();
     });
   }
 
@@ -62,7 +70,6 @@ class MapController {
       this.map._controller = this;
       this.model.location = this.Regions.current;
 
-      console.log(this.Outlets);
       this.initRemains();
       this.render();
     });
@@ -93,9 +100,16 @@ class MapController {
 
   pluckSize(size) {
     if (!this.map) return;
-    return this.outletsRemains ?
-      this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]) :
-      this.model.outlets;
+
+    if (this.outletsFilter) {
+      return this.outlets;
+    }
+
+    if (this.outletsRemains) {
+      return this.remains && (this.remains[size] || this.remains[this.selectedSize] || this.remains[0]);
+    }
+
+    return this.model.outlets;
   }
 
   setRegion(regionId, externalSet) {
@@ -128,9 +142,8 @@ class MapController {
   select(outlet) {
     if (!outlet) return;
     if (outlet.selected) return this.back();
-    console.log(outlet);
 
-    this.model.outlets.forEach((_outlet) => {
+    this.outlets.forEach((_outlet) => {
       const equal = _outlet.id === outlet.id;
       if (equal) {
         _outlet.remains = outlet.remains;
@@ -138,9 +151,9 @@ class MapController {
       _outlet.selected = (_outlet.id === outlet.id);
     });
 
-    this.openInfo(null, outlet);
+    this.openInfo(outlet);
     this.$window.google.maps.event.trigger(this.map, 'resize');
-    this.center = [outlet.geo[0], outlet.geo[1] + .0075];
+    this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1] + .0075));
     if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
   }
 
@@ -150,28 +163,19 @@ class MapController {
       this.selected.selected = false;
       this.selected = null;
     }
-    this.$scope.$evalAsync(() => {
-      //this.map.hideInfoWindow('info');
-      this.render();
-    });
+    this.$scope.$evalAsync(this.render.bind(this));
   }
 
   filterRemains(outlet) {
     return this.outletsRemains.filter((_remain) => _remain.outlet_id === outlet.id).length;
   }
 
-  openInfo(event, outlet) {
-    console.log(arguments);
-    const ctrl = event ? this.map._controller : this;
-    ctrl.scroll();
+  openInfo(outlet) {
+    this.selected = outlet;
+    this.selected.icon = '/src/images/new/marker-active.png';
+    this.$timeout(() => this.scroll());
 
-    ctrl.selected = outlet;
-    ctrl.selected.icon = '/src/images/new/marker-active.png';
-
-    //if (!this.map.singleInfoWindow) return;
-    //
     if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
-    //  this.map.hideInfoWindow('info');
       this.map.lastInfoWindow.icon = '';
     }
 
@@ -180,7 +184,12 @@ class MapController {
 
   scroll() {
     let list = document.querySelector('.adress-popup-list'); //eslint-disable-line angular/document-service
-    let selected = list.querySelector('.outlet-selected');
+    let selected = list.querySelector('.active');
+
+    if (!selected) {
+      return;
+    }
+
     angular.element(list).animate({
       scrollTop: selected.offsetTop - selected.offsetHeight
     });
@@ -204,7 +213,12 @@ class MapController {
     return this._showcase || this.remains ? 'list' : 'map';
   }
 
-  static getPrimary(images){
+  proxify(event, method, outlet) {
+    const ctrl = this.map._controller;
+    ctrl[method].call(ctrl, outlet);
+  }
+
+  static getPrimary(images) {
     return images && images.filter((image) => image.is_primary)[0];
   }
 }

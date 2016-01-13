@@ -244,6 +244,7 @@ ul li {list-style: none;}
   padding: 17px 20px 20px;
   background: #f8f8f8;
   border-left: 1px solid transparent;
+  cursor: pointer;
 }
 .adress-item-arrow {
   display: none;
@@ -338,7 +339,7 @@ ul li {list-style: none;}
   top: 40px;
   display: none;
   right: 10px;
-  width: 300px;
+  width: 311px;
   background: #fff;
 }
 .adress-popup-box.active {display: block;}
@@ -375,6 +376,10 @@ ul li {list-style: none;}
   letter-spacing: 1px;
   text-align: center;
   text-decoration: none;
+}
+
+.adress-popup-box-img img {
+  max-width: 100%;
 }
 .search-close {
   position: absolute;
