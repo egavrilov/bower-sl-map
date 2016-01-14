@@ -86,28 +86,34 @@
 	};
 
 	var MapController = (function () {
+
+	  /*
+	   Логика:
+	   - при выборе региона отображается ТТ региона
+	   - при отдалении карты - показываются в первую очередь ТТ выбранного региона
+	   - при поиске в первую очередь показываются ТТ выбранного региона
+	   - во вторую очередь в перечисленных случаях отображаются ТТ других регионов отсортированные по типу
+	   - От первой очереди вторая отделена подчеркнутым заголовком "В других регионах"
+	   Техника:
+	   - запрос точек по региону при ините
+	   - отрисовка точек по всей россии
+	   - добавление точек по региону в список справа
+	   - при поиске по названию/адресу - поиск среди всех точек по РФ
+	   - при выборе точки показывать список ТТ региона (если поле поиска пустое) или оставлять найденные ТТ (если заполнено поле поиска)
+	   - при зуме (и отсутствии выбранной точки) показывать точки которые находятся на карте
+	   - если включены остатки, показывать остатки по региону, когда увеличиваем зум и попадаем на точки другого региона - добавляем к ним остатки запросом в батч
+	    TODO:
+	   -- вернуть увеличение списка при отдалении
+	   -- крестик вынести за попап
+	   -- переключение на карту мобильный вид
+	   -- отцентровать активную иконку
+	   */
+
 	  /**
 	   @ngInject
 	   */
 
-	  /*
-	    Логика:
-	    - при выборе региона отображается ТТ региона
-	    - при отдалении карты - показываются в первую очередь ТТ выбранного региона
-	    - при поиске в первую очередь показываются ТТ выбранного региона
-	    - во вторую очередь в перечисленных случаях отображаются ТТ других регионов отсортированные по типу
-	    - От первой очереди вторая отделена подчеркнутым заголовком "В других регионах"
-	    Техника:
-	    - запрос точек по региону при ините
-	    - отрисовка точек по всей россии
-	    - добавление точек по региону в список справа
-	    - при поиске по названию/адресу - поиск среди всех точек по РФ
-	    - при выборе точки показывать список ТТ региона (если поле поиска пустое) или оставлять найденные ТТ (если заполнено поле поиска)
-	    - при зуме (и отсутствии выбранной точки) показывать точки которые находятся на карте
-	    - если включены остатки, показывать остатки по региону, когда увеличиваем зум и попадаем на точки другого региона - добавляем к ним остатки запросом в батч
-	    */
-
-	  function MapController(NgMap, Regions, Outlets, $scope, $timeout, $rootScope, $window, $q) {
+	  function MapController(NgMap, Regions, Outlets, $http, $scope, $timeout, $rootScope, $window, $q) {
 	    var _this = this;
 
 	    _classCallCheck(this, MapController);
@@ -119,6 +125,7 @@
 	    this.$timeout = $timeout;
 	    this.$window = $window;
 	    this.$q = $q;
+	    this.$http = $http;
 	    this.model = {};
 	    this.isMobile = /android|ip(hone|ad|od)/i.test($window.navigator.userAgent);
 	    this.selectedSize = this.selectedSize || 0;
@@ -151,11 +158,12 @@
 	        _this2.regions = _this2.Regions.all;
 	        _this2.outlets = responses.outlets;
 	        _this2.map = responses.map;
+	        _this2.map._controller = _this2;
 	        _this2.map.width = _this2.$window.outerWidth;
 	        _this2.map.height = _this2.$window.outerHeight;
-	        _this2.map._controller = _this2;
 	        _this2.model.location = _this2.Regions.current;
 
+	        //this.fetchRemains();
 	        _this2.initRemains();
 	        _this2.render();
 	      });
@@ -202,6 +210,15 @@
 	      return this.model.outlets;
 	    }
 	  }, {
+	    key: 'fetchRemains',
+	    value: function fetchRemains(article, region) {
+	      this.$http({
+	        method: 'post',
+	        url: 'http://api.love.sl/batch/',
+	        data: [{ method: 'get', url: 'http://api.love.sl/v2/outlets/regions/' }]
+	      });
+	    }
+	  }, {
 	    key: 'setRegion',
 	    value: function setRegion(regionId, externalSet) {
 	      regionId = regionId || this.model.location.id;
@@ -211,16 +228,46 @@
 	      this.render();
 	    }
 	  }, {
+	    key: 'resize',
+	    value: function resize() {
+	      var _this4 = this;
+
+	      var outlets = this.outlets;
+
+	      if (this.isMobile) {
+	        this.filtered = outlets;
+	      }
+
+	      if (this.outletsRemains) {
+	        outlets = this.remains && (this.remains[this.selectedSize] || this.remains[0]);
+	      }
+
+	      if (this.selected || this.isMobile) {
+	        return;
+	      }
+
+	      var bounds = this.map.getBounds();
+	      //let regionsOutlets = this.model.outlets.
+
+	      this.filtered = outlets.filter(function (outlet) {
+	        return(
+	          //(this.map.bounds.southwest.latitude < outlet.geo[0] && outlet.geo[0] < this.map.bounds.northeast.latitude &&
+	          //this.map.bounds.southwest.longitude < outlet.geo[1] && outlet.geo[1] < this.map.bounds.northeast.longitude)
+	          bounds.contains(_this4.gm('LatLng', outlet.geo[0], outlet.geo[1]))
+	        );
+	      });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      if (!this.model.outlets) return;
 	      this.bounds = this.gm('LatLngBounds');
 	      this.model.outlets.forEach(function (outlet) {
 	        if (outlet.geo && outlet.geo.length) {
-	          var marker = _this4.gm('LatLng', outlet.geo[0], outlet.geo[1]);
-	          _this4.bounds.extend(marker);
+	          var marker = _this5.gm('LatLng', outlet.geo[0], outlet.geo[1]);
+	          _this5.bounds.extend(marker);
 	        }
 	      });
 	      this.$window.google.maps.event.trigger(this.map, 'resize');
@@ -228,13 +275,19 @@
 	      if (this.selected) return;
 	      this.map.fitBounds(this.bounds);
 	      this.map.panToBounds(this.bounds);
-	      if (this.map.zoom > 15) this.map.setZoom(15);
+	      if (this.map.zoom > 14) this.map.setZoom(14);
 	    }
 	  }, {
 	    key: 'select',
 	    value: function select(outlet) {
 	      if (!outlet) return;
 	      if (outlet.selected) return this.back();
+	      var center = this.gm('LatLng', outlet.geo[0], outlet.geo[1] + .0075);
+
+	      if (this.isMobile) {
+	        center = this.gm('LatLng', outlet.geo[0] + .0035, outlet.geo[1]);
+	        this.isMapActive = true;
+	      }
 
 	      this.outlets.forEach(function (_outlet) {
 	        var equal = _outlet.id === outlet.id;
@@ -246,7 +299,7 @@
 
 	      this.openInfo(outlet);
 	      this.$window.google.maps.event.trigger(this.map, 'resize');
-	      this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1] + .0075));
+	      this.map.setCenter(center);
 	      if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
 	    }
 	  }, {
@@ -256,6 +309,8 @@
 	        this.selected.icon = '';
 	        this.selected.selected = false;
 	        this.selected = null;
+
+	        if (this.isMobile) this.isMapActive = false;
 	      }
 	      this.$scope.$evalAsync(this.render.bind(this));
 	    }
@@ -269,12 +324,12 @@
 	  }, {
 	    key: 'openInfo',
 	    value: function openInfo(outlet) {
-	      var _this5 = this;
+	      var _this6 = this;
 
 	      this.selected = outlet;
-	      this.selected.icon = '/src/images/new/marker-active.png';
+	      this.selected.icon = '/bower_components/sl-map/src/images/new/marker-active.png';
 	      this.$timeout(function () {
-	        return _this5.scroll();
+	        return _this6.scroll();
 	      });
 
 	      if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
@@ -307,13 +362,13 @@
 	  }, {
 	    key: 'showcase',
 	    value: function showcase(refresh) {
-	      var _this6 = this;
+	      var _this7 = this;
 
 	      if (refresh) {
 	        this._showcase = refresh;
 	        this.$timeout(function () {
-	          _this6.render();
-	          _this6.select();
+	          _this7.render();
+	          _this7.select();
 	        });
 	      }
 
@@ -322,7 +377,8 @@
 	  }, {
 	    key: 'proxify',
 	    value: function proxify(event, method, outlet) {
-	      var ctrl = this.map._controller;
+	      var ctrl = this._controller || this.map && this.map._controller;
+	      if (!ctrl) return;
 	      ctrl[method].call(ctrl, outlet);
 	    }
 	  }], [{
@@ -344,7 +400,7 @@
 /***/ function(module, exports) {
 
 	var path = '/home/eagavrilov/WebstormProjects/bower-sl-map/src/map.html';
-	var html = "<div class=\"loader\" ng-show=\"!slMap.map\"></div>\n<div class=\"adress-popup\" map-lazy-load=\"http://maps.google.com/maps/api/js\" ng-init=\"slMap.init()\">\n    <a href=\"\" class=\"adress-popup-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n    <a href=\"\" class=\"search-icon\"><img src=\"/src/images/all/loupe-icon.png\" alt=\"\"></a>\n    <div class=\"adress-popup-left active\">\n        <h3 class=\"adress-popup-title\">Где забрать?</h3>\n        <div class=\"adress-popup-tabs\">\n            <a href=\"\" class=\"adress-tab adress-tab-list active\">Список</a>\n            <a href=\"\" class=\"adress-tab adress-tab-map\">НА КАРТЕ</a>\n        </div>\n        <div class=\"adress-popup-search\">\n            <input class=\"input adress-popup-input\" type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\">\n        </div>\n        <div class=\"adress-popup-list\">\n            <div ng-repeat=\"outlet in slMap.pluckSize() |filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']\"\n                 ng-class=\"{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }\"\n                 ng-click=\"slMap.select(outlet)\"\n                 class=\"adress-popup-item\">\n                <div class=\"adress-popup-name\"><span ng-bind=\"::outlet.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"::outlet.kind.name\">гипермаркет</span></div>\n                <div class=\"adress-popup-street\">\n                    <span ng-bind=\"::outlet.address\">Москва, улица Арбат, 12 с 1</span>\n                    <div class=\"adress-popup-time\" ng-bind=\"::outlet.opening_hours\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in ::outlet.metros\">\n                    <span ng-bind=\"metro.name\">Электрозаводская</span>\n                </div>\n                <div class=\"adress-popup-info\" ng-if=\"::outlet.remains\">\n                    <span class=\"adress-popup-status adress-popup-status-green\" ng-if=\"::outlet.remains.available\">В наличии</span>\n                    <span class=\"adress-popup-status\" ng-if=\"::outlet.remains.pickup\">Под заказ</span>\n                    <span ng-if=\"::outlet.remains.available !== false\">Можно забрать <span ng-bind=\"::outlet.remains.pickup || 'сегодня'\"></span></span>\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <!--<div class=\"adress-popup-item adress-popup-item2 active\" data-mark=\"adress-mark2\" data-box=\"adress-box2\">\n                <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <div class=\"adress-popup-item adress-popup-item3\" data-mark=\"adress-mark3\" data-box=\"adress-box3\">\n                <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>-->\n        </div>\n    </div>\n    <div class=\"adress-popup-right\">\n        <ng-map class=\"adress-popup-map\" pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\" height=\"100%\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                single-info-window=\"true\" street-view-control=\"false\" center=\"[55.755773, 37.614608]\">\n            <!--<img src=\"/src/images/all/popup-map.jpg\" alt=\"\" class=\"adress-popup-map-img\">-->\n            <a href=\"\" class=\"adress-mark adress-mark1\" data-item=\"adress-popup-item1\" data-box=\"adress-box1\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark2 active\" data-item=\"adress-popup-item2\" data-box=\"adress-box2\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark3\" data-item=\"adress-popup-item3\" data-box=\"adress-box3\"></a>\n            <marker ng-repeat=\"outlet in slMap.outlets | filter: slMap.outletsFilter\"\n                    id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\"\n                    on-click=\"slMap.proxify('select', outlet)\"\n                    icon=\"{{outlet.icon || '/src/images/new/marker.png'}}\">\n            </marker>\n        </ng-map>\n    </div>\n    <div class=\"adress-popup-box-holder\" ng-if=\"slMap.selected\">\n        <div class=\"adress-popup-box active\">\n            <a href=\"\" class=\"adress-box-back\" ng-show=\"slMap.isMobile\" ng-click=\"slMap.back()\" ><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\" ng-click=\"slMap.back()\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span ng-bind=\"slMap.selected.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"slMap.selected.kind.name\">гипермаркет</span></div>\n            <div class=\"adress-popup-box-img\" ng-show=\"slMap.constructor.getPrimary(slMap.selected.images)\">\n                <img ng-src=\"{{slMap.constructor.getPrimary(slMap.selected.images).file}}\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\" ng-bind=\"slMap.selected.address\">\n                    Москва, улица Арбат, 12 с 1\n                    <div class=\"adress-popup-time\" ng-bind=\"slMap.selected.opening_hours\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in slMap.selected.metros\" ng-bind=\"metro.name\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать 24 сентября\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <!--<div class=\"adress-popup-box adress-box2 active\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <div class=\"adress-popup-box adress-box3\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>-->\n    </div>\n</div>\n";
+	var html = "<div class=\"loader\" ng-show=\"!slMap.map\"></div>\n<div class=\"adress-popup\" map-lazy-load=\"http://maps.google.com/maps/api/js\" ng-init=\"slMap.init()\">\n    <a href=\"\" class=\"search-icon\"><img src=\"/bower_components/sl-map/src/images/all/loupe-icon.png\" alt=\"\"></a>\n    <div class=\"adress-popup-left active\">\n        <h3 class=\"adress-popup-title\">Где забрать?</h3>\n        <div class=\"adress-popup-tabs\" ng-click=\"slMap.isMobile && (slMap.isMapActive = !slMap.isMapActive)\">\n            <a href=\"\" class=\"adress-tab adress-tab-list\" ng-class=\"{'active': !slMap.isMapActive}\">Список</a>\n            <a href=\"\" class=\"adress-tab adress-tab-map\" ng-class=\"{'active': slMap.isMapActive}\">НА КАРТЕ</a>\n        </div>\n        <div class=\"adress-popup-search\">\n            <input class=\"input adress-popup-input\" type=\"text\" ng-model=\"slMap.outletsFilter\" ng-change=\"slMap.bound()\">\n        </div>\n        <div class=\"adress-popup-list\" ng-show=\"!slMap.isMobile || !slMap.isMapActive\">\n            <div ng-repeat=\"outlet in slMap.filtered | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']\"\n                 ng-class=\"{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }\"\n                 ng-click=\"slMap.select(outlet)\"\n                 class=\"adress-popup-item\">\n                <div class=\"adress-popup-name\"><span ng-bind=\"::outlet.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"::outlet.kind.name\">гипермаркет</span></div>\n                <div class=\"adress-popup-street\">\n                    <span ng-bind=\"::outlet.address\">Москва, улица Арбат, 12 с 1</span>\n                    <div class=\"adress-popup-time\" ng-bind=\"::outlet.opening_hours\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in ::outlet.metros\">\n                    <span ng-style=\"{color: '#' + metro.color}\" class=\"futuraIcon\">&#x00BD;</span>\n                    <span ng-bind=\"metro.name\">Электрозаводская</span>\n                </div>\n                <div class=\"adress-popup-info\" ng-if=\"::outlet.remains\">\n                    <span class=\"adress-popup-status adress-popup-status-green\" ng-if=\"::outlet.remains.available\">В наличии</span>\n                    <span class=\"adress-popup-status\" ng-if=\"::outlet.remains.pickup\">Под заказ</span>\n                    <span ng-if=\"::outlet.remains.available !== false\">Можно забрать <span ng-bind=\"::outlet.remains.pickup || 'сегодня'\"></span></span>\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/bower_components/sl-map/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <div ng-if=\"slMap.outletsFilter\">В других регионах</div>\n            <div ng-repeat=\"outlet in slMap.outlets | filter: !slMap.location.id | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']\"\n                 ng-class=\"{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }\"\n                 ng-click=\"slMap.select(outlet)\"\n                 ng-if=\"slMap.outletsFilter\"\n                 class=\"adress-popup-item\">\n                <div class=\"adress-popup-name\"><span ng-bind=\"::outlet.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"::outlet.kind.name\">гипермаркет</span></div>\n                <div class=\"adress-popup-street\">\n                    <span ng-bind=\"::outlet.address\">Москва, улица Арбат, 12 с 1</span>\n                    <div class=\"adress-popup-time\" ng-bind=\"::outlet.opening_hours\">ПН-ВС 10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in ::outlet.metros\">\n                    <span ng-style=\"{color: '#' + metro.color}\" class=\"futuraIcon\">&#x00BD;</span>\n                    <span ng-bind=\"metro.name\">Электрозаводская</span>\n                </div>\n                <div class=\"adress-popup-info\" ng-if=\"::outlet.remains\">\n                    <span class=\"adress-popup-status adress-popup-status-green\" ng-if=\"::outlet.remains.available\">В наличии</span>\n                    <span class=\"adress-popup-status\" ng-if=\"::outlet.remains.pickup\">Под заказ</span>\n                    <span ng-if=\"::outlet.remains.available !== false\">Можно забрать <span ng-bind=\"::outlet.remains.pickup || 'сегодня'\"></span></span>\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/bower_components/sl-map/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <!--<div class=\"adress-popup-item adress-popup-item2 active\" data-mark=\"adress-mark2\" data-box=\"adress-box2\">\n                <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/bower_components/sl-map/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>\n            <div class=\"adress-popup-item adress-popup-item3\" data-mark=\"adress-mark3\" data-box=\"adress-box3\">\n                <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <span class=\"adress-item-arrow\"><img src=\"/bower_components/sl-map/src/images/all/adress-arrow-left.png\" alt=\"\"></span>\n            </div>-->\n        </div>\n    </div>\n    <div class=\"adress-popup-right\" ng-class=\"{'invisible': !slMap.isMobile && !slMap.isMapActive}\">\n        <ng-map class=\"adress-popup-map\" pan-control=\"true\" pan-control-options=\"{position:'TOP_RIGHT'}\" map-type-control=\"false\" height=\"100%\"\n                zoom-control=\"true\" zoom-control-options=\"{style:'LARGE', position:'LEFT_TOP'}\" scale-control=\"true\"\n                on-bounds_changed=\"slMap.proxify(event, 'resize')\" single-info-window=\"true\" street-view-control=\"false\" center=\"[55.755773, 37.614608]\">\n            <!--<img src=\"/bower_components/sl-map/src/images/all/popup-map.jpg\" alt=\"\" class=\"adress-popup-map-img\">-->\n            <a href=\"\" class=\"adress-mark adress-mark1\" data-item=\"adress-popup-item1\" data-box=\"adress-box1\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark2 active\" data-item=\"adress-popup-item2\" data-box=\"adress-box2\"></a>\n            <a href=\"\" class=\"adress-mark adress-mark3\" data-item=\"adress-popup-item3\" data-box=\"adress-box3\"></a>\n            <marker ng-repeat=\"outlet in slMap.outlets | filter: slMap.outletsFilter\"\n                    id=\"outlet_{{::outlet.id}}\"\n                    position=\"{{::outlet.geo}}\"\n                    on-click=\"slMap.proxify('select', outlet)\"\n                    icon=\"{{outlet.icon || '/bower_components/sl-map/src/images/new/marker'+ (outlet.remains ? '-remains' : '') +'.png'}}\">\n            </marker>\n        </ng-map>\n    </div>\n    <div class=\"adress-popup-box-holder\" ng-if=\"slMap.selected\">\n        <div class=\"adress-popup-box active\">\n            <a href=\"\" class=\"adress-box-back\" ng-show=\"slMap.isMobile\" ng-click=\"slMap.back()\" ><img src=\"/bower_components/sl-map/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\" ng-click=\"slMap.back()\"><img src=\"/bower_components/sl-map/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span ng-bind=\"slMap.selected.mall\">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind=\"slMap.selected.kind.name\">гипермаркет</span></div>\n            <div class=\"adress-popup-box-img\" ng-show=\"slMap.constructor.getPrimary(slMap.selected.images)\">\n                <img ng-src=\"{{slMap.constructor.getPrimary(slMap.selected.images).file}}\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\" ng-bind=\"slMap.selected.address\">\n                    Москва, улица Арбат, 12 с 1\n                </div>\n                <div class=\"adress-popup-time\" ng-bind=\"slMap.selected.opening_hours\">ПН-ВС 10:00-22:00</div>\n                <div class=\"adress-popup-metro\" ng-repeat=\"metro in slMap.selected.metros\">\n                    <span ng-style=\"{color: '#' + metro.color}\" class=\"futuraIcon\">&#x00BD;</span>\n                    <span ng-bind=\"metro.name\">Электрозаводская</span>\n                </div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать 24 сентября\n                </div>\n                <a href=\"\" class=\"button\" ng-if=\"slMap.selected.remains\" ng-click=\"reserve.openReserveDialog(slMap.selected.remains)\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <!--<div class=\"adress-popup-box adress-box2 active\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/bower_components/sl-map/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/bower_components/sl-map/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>ТЦ РИО</span> СЕКция</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/bower_components/sl-map/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Москва, Мажоритарный пр. 8\n                    <div class=\"adress-popup-time\">10:00-22:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status adress-popup-status-green\">В наличии</span>\n                    Можно забрать прямо сейчас\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>\n        <div class=\"adress-popup-box adress-box3\">\n            <a href=\"\" class=\"adress-box-back\"><img src=\"/bower_components/sl-map/src/images/all/adress-arrow-right.png\" alt=\"\"></a>\n            <a href=\"\" class=\"adress-box-close\"><img src=\"/bower_components/sl-map/src/images/all/cross-grey.png\" alt=\"\"></a>\n            <div class=\"adress-popup-name\"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>\n            <div class=\"adress-popup-box-img\">\n                <img src=\"/bower_components/sl-map/src/images/all/adress-img1.jpg\" alt=\"\">\n            </div>\n            <div class=\"adress-popup-box-text\">\n                <div class=\"adress-popup-street\">\n                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ\n                    <div class=\"adress-popup-time\">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>\n                </div>\n                <div class=\"adress-popup-metro\">Электрозаводская</div>\n                <div class=\"adress-popup-info\">\n                    <span class=\"adress-popup-status\">Под заказ</span>\n                    Можно забрать завтра\n                </div>\n                <a href=\"\" class=\"button\">ЗАРЕЗЕРВИРОВАТЬ</a>\n            </div>\n        </div>-->\n    </div>\n</div>\n";
 	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, html) }]);
 	module.exports = path;
 

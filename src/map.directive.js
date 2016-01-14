@@ -13,28 +13,34 @@ class Map {
 }
 
 class MapController {
+
+  /*
+   Логика:
+   - при выборе региона отображается ТТ региона
+   - при отдалении карты - показываются в первую очередь ТТ выбранного региона
+   - при поиске в первую очередь показываются ТТ выбранного региона
+   - во вторую очередь в перечисленных случаях отображаются ТТ других регионов отсортированные по типу
+   - От первой очереди вторая отделена подчеркнутым заголовком "В других регионах"
+   Техника:
+   - запрос точек по региону при ините
+   - отрисовка точек по всей россии
+   - добавление точек по региону в список справа
+   - при поиске по названию/адресу - поиск среди всех точек по РФ
+   - при выборе точки показывать список ТТ региона (если поле поиска пустое) или оставлять найденные ТТ (если заполнено поле поиска)
+   - при зуме (и отсутствии выбранной точки) показывать точки которые находятся на карте
+   - если включены остатки, показывать остатки по региону, когда увеличиваем зум и попадаем на точки другого региона - добавляем к ним остатки запросом в батч
+
+   TODO:
+   -- вернуть увеличение списка при отдалении
+   -- крестик вынести за попап
+   -- переключение на карту мобильный вид
+   -- отцентровать активную иконку
+   */
+
   /**
    @ngInject
    */
-
-  /*
-    Логика:
-    - при выборе региона отображается ТТ региона
-    - при отдалении карты - показываются в первую очередь ТТ выбранного региона
-    - при поиске в первую очередь показываются ТТ выбранного региона
-    - во вторую очередь в перечисленных случаях отображаются ТТ других регионов отсортированные по типу
-    - От первой очереди вторая отделена подчеркнутым заголовком "В других регионах"
-    Техника:
-    - запрос точек по региону при ините
-    - отрисовка точек по всей россии
-    - добавление точек по региону в список справа
-    - при поиске по названию/адресу - поиск среди всех точек по РФ
-    - при выборе точки показывать список ТТ региона (если поле поиска пустое) или оставлять найденные ТТ (если заполнено поле поиска)
-    - при зуме (и отсутствии выбранной точки) показывать точки которые находятся на карте
-    - если включены остатки, показывать остатки по региону, когда увеличиваем зум и попадаем на точки другого региона - добавляем к ним остатки запросом в батч
-
-   */
-  constructor(NgMap, Regions, Outlets, $scope, $timeout, $rootScope, $window, $q) {
+  constructor(NgMap, Regions, Outlets, $http, $scope, $timeout, $rootScope, $window, $q) {
     this.NgMap = NgMap;
     this.Regions = Regions;
     this.Outlets = Outlets;
@@ -42,6 +48,7 @@ class MapController {
     this.$timeout = $timeout;
     this.$window = $window;
     this.$q = $q;
+    this.$http = $http;
     this.model = {};
     this.isMobile = /android|ip(hone|ad|od)/i.test($window.navigator.userAgent);
     this.selectedSize = this.selectedSize || 0;
@@ -70,11 +77,12 @@ class MapController {
       this.regions = this.Regions.all;
       this.outlets = responses.outlets;
       this.map = responses.map;
+      this.map._controller = this;
       this.map.width = this.$window.outerWidth;
       this.map.height = this.$window.outerHeight;
-      this.map._controller = this;
       this.model.location = this.Regions.current;
 
+      //this.fetchRemains();
       this.initRemains();
       this.render();
     });
@@ -117,6 +125,14 @@ class MapController {
     return this.model.outlets;
   }
 
+  fetchRemains(article, region) {
+    this.$http({
+      method: 'post',
+      url: 'http://api.love.sl/batch/',
+      data: [{method: 'get', url: 'http://api.love.sl/v2/outlets/regions/'}]
+    });
+  }
+
   setRegion(regionId, externalSet) {
     regionId = regionId || this.model.location.id;
     this.back();
@@ -125,6 +141,30 @@ class MapController {
       this.Outlets.byRegion(regionId);
     if (!externalSet) this.Regions.setRegion(regionId);
     this.render();
+  }
+
+  resize() {
+    let outlets = this.outlets;
+
+    if (this.isMobile) {
+      this.filtered = outlets;
+    }
+
+    if (this.outletsRemains) {
+      outlets = this.remains && (this.remains[this.selectedSize] || this.remains[0]);
+    }
+
+    if (this.selected || this.isMobile) {
+      return;
+    }
+
+    let bounds = this.map.getBounds();
+    //let regionsOutlets = this.model.outlets.
+
+    this.filtered = outlets.filter((outlet) =>
+      //(this.map.bounds.southwest.latitude < outlet.geo[0] && outlet.geo[0] < this.map.bounds.northeast.latitude &&
+      //this.map.bounds.southwest.longitude < outlet.geo[1] && outlet.geo[1] < this.map.bounds.northeast.longitude)
+      bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1])));
   }
 
   render() {
@@ -141,12 +181,18 @@ class MapController {
     if (this.selected) return;
     this.map.fitBounds(this.bounds);
     this.map.panToBounds(this.bounds);
-    if (this.map.zoom > 15) this.map.setZoom(15);
+    if (this.map.zoom > 14) this.map.setZoom(14);
   }
 
   select(outlet) {
     if (!outlet) return;
     if (outlet.selected) return this.back();
+    let center = this.gm('LatLng', outlet.geo[0], outlet.geo[1] + .0075);
+
+    if (this.isMobile) {
+      center = this.gm('LatLng', outlet.geo[0] + .0035, outlet.geo[1]);
+      this.isMapActive = true;
+    }
 
     this.outlets.forEach((_outlet) => {
       const equal = _outlet.id === outlet.id;
@@ -158,7 +204,7 @@ class MapController {
 
     this.openInfo(outlet);
     this.$window.google.maps.event.trigger(this.map, 'resize');
-    this.map.setCenter(this.gm('LatLng', outlet.geo[0], outlet.geo[1] + .0075));
+    this.map.setCenter(center);
     if (this.selected || this.map.zoom < 15) this.map.setZoom(15);
   }
 
@@ -167,6 +213,8 @@ class MapController {
       this.selected.icon = '';
       this.selected.selected = false;
       this.selected = null;
+
+      if (this.isMobile) this.isMapActive = false;
     }
     this.$scope.$evalAsync(this.render.bind(this));
   }
@@ -177,7 +225,7 @@ class MapController {
 
   openInfo(outlet) {
     this.selected = outlet;
-    this.selected.icon = '/src/images/new/marker-active.png';
+    this.selected.icon = '/bower_components/sl-map/src/images/new/marker-active.png';
     this.$timeout(() => this.scroll());
 
     if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
@@ -219,7 +267,8 @@ class MapController {
   }
 
   proxify(event, method, outlet) {
-    const ctrl = this.map._controller;
+    const ctrl = this._controller || (this.map && this.map._controller);
+    if (!ctrl) return;
     ctrl[method].call(ctrl, outlet);
   }
 

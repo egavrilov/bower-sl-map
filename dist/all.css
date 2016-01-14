@@ -1,70 +1,22 @@
 @font-face {
   font-family: 'futurabookcregular';
-  src: url('../src/fonts/futurabookc-webfont.eot');
-  src: url('../src/fonts/futurabookc-webfont-.eot#iefix') format('embedded-opentype'),
-  url('../src/fonts/futurabookc-webfont.woff2') format('woff2'),
-  url('../src/fonts/futurabookc-webfont.woff') format('woff'),
-  url('../src/fonts/futurabookc-webfont.ttf') format('truetype');
+  src: url('/bower_components/sl-map/src/fonts/FuturaBookC[metro-place].eot');
+  src: url('/bower_components/sl-map/src/fonts/FuturaBookC[metro-place].eot#iefix') format('embedded-opentype'),
+  url('/bower_components/sl-map/src/fonts/FuturaBookC[metro-place].woff') format('woff'),
+  url('/bower_components/sl-map/src/fonts/FuturaBookC[metro-place].ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'FuturaDemiC';
-  src: url('../src/fonts/FuturaDemiC.eot');
-  src: url('../src/fonts/FuturaDemiC.eot') format('embedded-opentype'),
-  url('../src/fonts/FuturaDemiC.woff2') format('woff2'),
-  url('../src/fonts/FuturaDemiC.woff') format('woff'),
-  url('../src/fonts/FuturaDemiC.ttf') format('truetype');
+  src: url('/bower_components/sl-map/src/fonts/FuturaDemiC.eot');
+  src: url('/bower_components/sl-map/src/fonts/FuturaDemiC.eot') format('embedded-opentype'),
+  url('/bower_components/sl-map/src/fonts/FuturaDemiC.woff2') format('woff2'),
+  url('/bower_components/sl-map/src/fonts/FuturaDemiC.woff') format('woff'),
+  url('/bower_components/sl-map/src/fonts/FuturaDemiC.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
-/************************* reset *************************/
-html{
-  height: 100%;
-  margin: 0;
-  padding: 0;width: 100%;
-  background: #fff;
-}
-body{
-  height: 100%;
-  width: 100%;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  font-size: 0.625em;
-  font-weight: 400;
-  font-family: 'futurabookcregular', Arial, Helvetica, sans-serif;
-  line-height: 24px;
-  min-width: 320px;
-  color: #000;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-}
-h1, h2, h3, h4, p, ul, li, a, span, div, input, textarea, select, form, fieldset, button, dl, dd, dt, figure, figcaption, blockquote, caption, section, aside, footer, header, nav, canvas {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  box-sizing: border-box;
-}
-img {
-  margin: 0;
-  padding: 0;
-  border-style: none;
-  vertical-align: bottom;
-}
-input, textarea, select{
-  font-family: 'futurabookcregular', Arial, Helvetica, sans-serif;
-  vertical-align: middle;
-  border: 0;
-  outline: 0;
-  background: none;
-}
-a:hover {text-decoration: none;}
-ul li {list-style: none;}
-/************************* reset *************************/
-/************************* wrapper *************************/
-
 /************************* form styles *************************/
 .input {
   display: block;
@@ -163,10 +115,12 @@ ul li {list-style: none;}
 /************************* popup styles *************************/
 .adress-popup {
   position: relative;
-  width: 960px;
+  width: 984px;
+  max-width: 100%;
   height: 600px;
   color: #000;
   background: #fff;
+  font-size: 12px;
 }
 .adress-popup:after {
   display: block;
@@ -238,6 +192,7 @@ ul li {list-style: none;}
 .adress-popup-list {
   overflow-y: auto;
   height: 520px;
+  font-family: 'FuturaBookCRegular';
 }
 .adress-popup-item {
   position: relative;
@@ -272,7 +227,7 @@ ul li {list-style: none;}
 .adress-popup-name span:first-child {font-family: 'FuturaDemiC';}
 .adress-popup-street {
   padding: 0 0 0 21px;
-  font-size: 1.6em;
+  font-size: 15px;
   line-height: 20px;
   background: url("http://scr.amik.am/sunlight_adress/images/map-icon.png") 2px 2px no-repeat;
 }
@@ -282,13 +237,17 @@ ul li {list-style: none;}
 }
 .adress-popup-metro {
   padding: 0 0 0 21px;
-  margin: 0 0 9px;
-  font-size: 1.6em;
+  margin: 0 0 0 -21px;
+  font-size: 15px;
   line-height: 20px;
-  background: url("http://scr.amik.am/sunlight_adress/images/metro-icon.png") 0 3px no-repeat;
+}
+.futuraIcon {
+  width: 18px;
+  display: inline-block;
+  font-family: 'futurabookcregular';
 }
 .adress-popup-info {
-  font-size: 1.3em;
+  font-size: 13px;
   line-height: 21px;
   display: none;
 }
@@ -297,7 +256,6 @@ ul li {list-style: none;}
 }
 .adress-popup-status {
   display: inline-block;
-  height: 23px;
   padding: 0 3px;
   font-family: 'FuturaDemiC';
   line-height: 21px;
@@ -306,14 +264,18 @@ ul li {list-style: none;}
 .adress-popup-status-green {background: #d3efbd;}
 .adress-popup-right {
   margin-left: 300px;
+  overflow: hidden;
 }
 .adress-popup-map {
   position: relative;
   overflow: hidden;
+  width: 684px;
+  max-width: 100%;
   height: 600px;
+  max-height: 100%;
 }
 .adress-popup-map-img {
-  width: 660px;
+  width: 684px;
 }
 .adress-mark {
   position: absolute;
@@ -341,6 +303,8 @@ ul li {list-style: none;}
   right: 10px;
   width: 311px;
   background: #fff;
+  font-size: 12px;
+  font-family: 'FuturaBookCRegular';
 }
 .adress-popup-box.active {display: block;}
 .adress-box-close {
@@ -362,50 +326,48 @@ ul li {list-style: none;}
   vertical-align: top;
 }
 .adress-popup-box .adress-popup-name {
-  padding: 12px 30px 6px;
+  padding: 14px 30px 6px;
   text-align: center;
 }
+.adress-popup-box-text .adress-popup-time { padding-left: 21px; }
 .adress-popup-box-text {
   padding: 15px 20px 20px;
 }
-.adress-popup-box .adress-popup-info {margin: 0 0 20px;}
 .adress-popup-box .button {
   height: 40px;
   font-size: 1.6em;
-  line-height: 38px;
+  line-height: 40px;
   letter-spacing: 1px;
   text-align: center;
   text-decoration: none;
+  margin-top: 15px;
 }
 
 .adress-popup-box-img img {
   max-width: 100%;
   height: auto;
 }
-.search-close {
+.adress-popup .search-close {
   position: absolute;
   top: 15px;
   right: 10px;
   display: none;
   background: #fff;
 }
-.search-close img {
+.adress-popup .search-close img {
   width: 18px;
   vertical-align: top;
 }
-.search-icon {
+.adress-popup .search-icon {
   position: absolute;
   top: 10px;
   left: 10px;
   display: none;
 }
-.search-icon img {
+.adress-popup .search-icon img {
   width: 18px;
   vertical-align: top;
 }
-
-
-
 
 .min-popup {
   position: relative;
@@ -508,21 +470,23 @@ ul li {list-style: none;}
 /************************* media *************************/
 @media screen and (max-width: 1023px) {
   .adress-popup {
-    width: 600px;
-    height: 440px;
+    /*width: 600px;*/
+    height: 98vh;
   }
-  .adress-popup-box.active {//display: none;}
+  .adress-popup-box.active { position: fixed;}
   .adress-popup-box {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
     z-index: 70;
   }
   .adress-popup-box-img {
     overflow: hidden;
     max-height: 200px;
     text-align: center;
+  }
+  .adress-popup-box-text {
+    padding-bottom: 75px;
   }
   .adress-popup-left {
     position: relative;
@@ -534,17 +498,18 @@ ul li {list-style: none;}
   .adress-popup-right {
     position: absolute;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 80px);
     left: 0;
-    top: 0;
+    top: 80px;/*
     overflow: hidden;
-    display: none;
+    display: none;*/
     margin: 0;
   }
   .adress-popup-right.active {display: block;}
+  .adress-popup-right.invisible { visibility: hidden;}
   .adress-popup-list {
     display: none;
-    height: 360px;
+    height: calc(100% - 60px);
   }
   .adress-popup-left.active .adress-popup-list {display: block;}
   .adress-popup-search {
@@ -563,8 +528,11 @@ ul li {list-style: none;}
     right: 20px;
     bottom: 20px;
   }
-  .search-icon {display: block;}
-  .search-icon, .search-close {z-index: 20;}
+  .adress-popup-box .button:hover {
+    position: absolute;
+  }
+  /*.adress-popup .search-icon {display: none;}*/
+  .adress-popup .search-icon, .adress-popup .search-close {z-index: 20;}
   .adress-popup-search {
     display: none;
     position: absolute;
@@ -577,12 +545,12 @@ ul li {list-style: none;}
 }
 @media screen and (max-width: 640px) {
   .adress-popup {
-    width: 480px;
+    /*width: 480px;*/
   }
 }
 @media screen and (max-width: 560px) {
   .adress-popup {
-    width: 300px;
+    /*width: 300px;*/
   }
 }
 @media screen and (max-width: 480px) {
