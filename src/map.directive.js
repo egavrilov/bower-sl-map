@@ -132,11 +132,15 @@ class MapController {
     return this.model.outlets;
   }
 
-  fetchRemains(outlet, regionId) {
-    this.Remains.fetch(null, regionId).then((response) => {
+  fetchRemains(outlet, regionId, index) {
+    return this.Remains.fetch(null, regionId).then((response) => {
       this.outletsRemains.concat(response.data);
       outlet.remains = response.data.filter((_remain) =>
         _remain.outlet_id === outlet.id && Number(this.selectedSize) === _remain.size)[0];
+
+      if (!outlet.remains) {
+        this.$timeout(() => this.otherRegion.splice(index, 1));
+      }
     });
   }
 

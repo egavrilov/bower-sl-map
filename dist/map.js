@@ -219,14 +219,20 @@
 	    }
 	  }, {
 	    key: 'fetchRemains',
-	    value: function fetchRemains(outlet, regionId) {
+	    value: function fetchRemains(outlet, regionId, index) {
 	      var _this4 = this;
 
-	      this.Remains.fetch(null, regionId).then(function (response) {
+	      return this.Remains.fetch(null, regionId).then(function (response) {
 	        _this4.outletsRemains.concat(response.data);
 	        outlet.remains = response.data.filter(function (_remain) {
 	          return _remain.outlet_id === outlet.id && Number(_this4.selectedSize) === _remain.size;
 	        })[0];
+
+	        if (!outlet.remains) {
+	          _this4.$timeout(function () {
+	            return _this4.otherRegion.splice(index, 1);
+	          });
+	        }
 	      });
 	    }
 	  }, {
