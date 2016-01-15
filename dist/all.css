@@ -364,6 +364,15 @@
   left: 10px;
   display: none;
 }
+.adress-popup .adress-popup-other-region {
+  margin-top: 1em;
+  padding-left: 21px;
+  text-transform: uppercase;
+  font-weight: 200;
+  border-bottom: 1px solid;
+  font-family: 'FuturaBookCRegular';
+  font-size: 1.3em;
+}
 .adress-popup .search-icon img {
   width: 18px;
   vertical-align: top;
@@ -498,11 +507,9 @@
   .adress-popup-right {
     position: absolute;
     width: 100%;
-    height: calc(100% - 80px);
+    height: calc(100% - 90px);
     left: 0;
-    top: 80px;/*
-    overflow: hidden;
-    display: none;*/
+    top: 90px;
     margin: 0;
   }
   .adress-popup-right.active {display: block;}
@@ -531,6 +538,8 @@
   .adress-popup-box .button:hover {
     position: absolute;
   }
+
+  .adress-box-close { display: none; }
   /*.adress-popup .search-icon {display: none;}*/
   .adress-popup .search-icon, .adress-popup .search-close {z-index: 20;}
   .adress-popup-search {

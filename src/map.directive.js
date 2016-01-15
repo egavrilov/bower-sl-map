@@ -40,8 +40,9 @@ class MapController {
   /**
    @ngInject
    */
-  constructor(NgMap, Regions, Outlets, $http, $scope, $timeout, $rootScope, $window, $q) {
+  constructor(NgMap, Remains, Regions, Outlets, $http, $scope, $timeout, $rootScope, $window, $q) {
     this.NgMap = NgMap;
+    this.Remains = Remains;
     this.Regions = Regions;
     this.Outlets = Outlets;
     this.$scope = $scope;
@@ -96,7 +97,11 @@ class MapController {
 
     if (!this.outletsRemains) return;
 
-    this.remains = this.outletsRemains.reduce((remains, remain) => {
+    this.remains = this.reduceBySize(this.outletsRemains);
+  }
+
+  reduceBySize (remainsArr) {
+    const remains = remainsArr.reduce((remains, remain) => {
       let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
       if (!outlet || !remain.hasOwnProperty('available') && !remain.pickup) {
         return remains;
@@ -109,6 +114,8 @@ class MapController {
 
       return remains;
     }, {});
+
+    return remains;
   }
 
   pluckSize(size) {
@@ -125,11 +132,11 @@ class MapController {
     return this.model.outlets;
   }
 
-  fetchRemains(article, region) {
-    this.$http({
-      method: 'post',
-      url: 'http://api.love.sl/batch/',
-      data: [{method: 'get', url: 'http://api.love.sl/v2/outlets/regions/'}]
+  fetchRemains(outlet, regionId) {
+    this.Remains.fetch(null, regionId).then((response) => {
+      this.outletsRemains.concat(response.data);
+      outlet.remains = response.data.filter((_remain) =>
+        _remain.outlet_id === outlet.id && Number(this.selectedSize) === _remain.size)[0];
     });
   }
 
@@ -144,27 +151,41 @@ class MapController {
   }
 
   resize() {
-    let outlets = this.outlets;
+    if (this._resizeTimeout)
+      this.$timeout.cancel(this._resizeTimeout);
 
-    if (this.isMobile) {
-      this.filtered = outlets;
-    }
+    this._resizeTimeout = this.$timeout(() => {
+      let outlets = this.outlets;
 
-    if (this.outletsRemains) {
-      outlets = this.remains && (this.remains[this.selectedSize] || this.remains[0]);
-    }
+      if (this.outletsRemains) {
+        outlets = this.remains && (this.remains[this.selectedSize] || this.remains[0]);
+      }
 
-    if (this.selected || this.isMobile) {
-      return;
-    }
+      if (this.isMobile) {
+        this.filtered = outlets;
+      }
 
-    let bounds = this.map.getBounds();
-    //let regionsOutlets = this.model.outlets.
+      if (this.selected || this.isMobile) {
+        return;
+      }
 
-    this.filtered = outlets.filter((outlet) =>
-      //(this.map.bounds.southwest.latitude < outlet.geo[0] && outlet.geo[0] < this.map.bounds.northeast.latitude &&
-      //this.map.bounds.southwest.longitude < outlet.geo[1] && outlet.geo[1] < this.map.bounds.northeast.longitude)
-      bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1])));
+      let bounds = this.map.getBounds();
+
+      this.filtered = outlets.filter((outlet) =>
+        bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1])));
+
+      this.otherRegion = this.outletsRemains &&
+        this.outlets.filter((outlet) => {
+          if (!bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1])))
+            return;
+
+          if (outlet.region_id.indexOf(this.model.location.id) !== -1)
+            return;
+
+          outlet.region_id.forEach(this.fetchRemains.bind(this, outlet));
+          return true;
+        });
+    }, 450);
   }
 
   render() {

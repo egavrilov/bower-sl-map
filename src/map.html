@@ -31,11 +31,11 @@
                 </div>
                 <span class="adress-item-arrow"><img src="/bower_components/sl-map/src/images/all/adress-arrow-left.png" alt=""></span>
             </div>
-            <div ng-if="slMap.outletsFilter">В других регионах</div>
-            <div ng-repeat="outlet in slMap.outlets | filter: !slMap.location.id | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
+            <div ng-if="slMap.outletsFilter || slMap.otherRegion.length" class="adress-popup-other-region">В других регионах</div>
+            <div ng-repeat="outlet in slMap.otherRegion | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
                  ng-class="{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }"
                  ng-click="slMap.select(outlet)"
-                 ng-if="slMap.outletsFilter"
+                 ng-if="outlet.remains && (slMap.outletsFilter || slMap.otherRegion)"
                  class="adress-popup-item">
                 <div class="adress-popup-name"><span ng-bind="::outlet.mall">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind="::outlet.kind.name">гипермаркет</span></div>
                 <div class="adress-popup-street">
@@ -46,10 +46,10 @@
                     <span ng-style="{color: '#' + metro.color}" class="futuraIcon">&#x00BD;</span>
                     <span ng-bind="metro.name">Электрозаводская</span>
                 </div>
-                <div class="adress-popup-info" ng-if="::outlet.remains">
-                    <span class="adress-popup-status adress-popup-status-green" ng-if="::outlet.remains.available">В наличии</span>
-                    <span class="adress-popup-status" ng-if="::outlet.remains.pickup">Под заказ</span>
-                    <span ng-if="::outlet.remains.available !== false">Можно забрать <span ng-bind="::outlet.remains.pickup || 'сегодня'"></span></span>
+                <div class="adress-popup-info" ng-if="outlet.remains">
+                    <span class="adress-popup-status adress-popup-status-green" ng-if="outlet.remains.available">В наличии</span>
+                    <span class="adress-popup-status" ng-if="outlet.remains.pickup">Под заказ</span>
+                    <span ng-if="outlet.remains.available !== false">Можно забрать <span ng-bind="::outlet.remains.pickup || 'сегодня'"></span></span>
                 </div>
                 <span class="adress-item-arrow"><img src="/bower_components/sl-map/src/images/all/adress-arrow-left.png" alt=""></span>
             </div>
@@ -93,7 +93,7 @@
                     id="outlet_{{::outlet.id}}"
                     position="{{::outlet.geo}}"
                     on-click="slMap.proxify('select', outlet)"
-                    icon="{{outlet.icon || '/bower_components/sl-map/src/images/new/marker'+ (outlet.remains ? '-remains' : '') +'.png'}}">
+                    icon="{{outlet.icon || '/bower_components/sl-map/src/images/new/marker'+ (outlet.remains.available ? '-remains' : '') +'.png'}}">
             </marker>
         </ng-map>
     </div>
