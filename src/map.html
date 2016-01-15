@@ -81,10 +81,11 @@
             </div>-->
         </div>
     </div>
-    <div class="adress-popup-right" ng-class="{'invisible': !slMap.isMobile && !slMap.isMapActive}">
+    <div class="adress-popup-right" ng-class="{'invisible': slMap.isMobile && !slMap.isMapActive}">
         <ng-map class="adress-popup-map" pan-control="true" pan-control-options="{position:'TOP_RIGHT'}" map-type-control="false" height="100%"
                 zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true"
-                on-bounds_changed="slMap.proxify(event, 'resize')" single-info-window="true" street-view-control="false" center="[55.755773, 37.614608]">
+                on-bounds_changed="slMap.proxify(event, 'resize')" single-info-window="true" street-view-control="false"
+                center="[55.755773, 37.614608]">
             <!--<img src="/bower_components/sl-map/src/images/all/popup-map.jpg" alt="" class="adress-popup-map-img">-->
             <a href="" class="adress-mark adress-mark1" data-item="adress-popup-item1" data-box="adress-box1"></a>
             <a href="" class="adress-mark adress-mark2 active" data-item="adress-popup-item2" data-box="adress-box2"></a>

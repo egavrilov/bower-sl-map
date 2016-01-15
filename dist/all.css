@@ -513,7 +513,7 @@
     margin: 0;
   }
   .adress-popup-right.active {display: block;}
-  .adress-popup-right.invisible { visibility: hidden;}
+  .adress-popup-right.invisible .adress-popup-map { visibility: hidden;}
   .adress-popup-list {
     display: none;
     height: calc(100% - 60px);
