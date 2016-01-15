@@ -8,7 +8,7 @@
             <a href="" class="adress-tab adress-tab-map" ng-class="{'active': slMap.isMapActive}">НА КАРТЕ</a>
         </div>
         <div class="adress-popup-search">
-            <input class="input adress-popup-input" type="text" ng-model="slMap.outletsFilter" ng-change="slMap.bound()">
+            <input class="input adress-popup-input" type="text" ng-model="slMap.outletsFilter" ng-change="slMap.resize()">
         </div>
         <div class="adress-popup-list" ng-show="!slMap.isMobile || !slMap.isMapActive">
             <div ng-repeat="outlet in slMap.filtered | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
@@ -35,7 +35,7 @@
             <div ng-repeat="outlet in slMap.otherRegion | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
                  ng-class="{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }"
                  ng-click="slMap.select(outlet)"
-                 ng-if="outlet.remains && (slMap.outletsFilter || slMap.otherRegion)"
+                 ng-if="(slMap.outletsFilter || outlet.remains) && slMap.otherRegion"
                  class="adress-popup-item">
                 <div class="adress-popup-name"><span ng-bind="::outlet.mall">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind="::outlet.kind.name">гипермаркет</span></div>
                 <div class="adress-popup-street">

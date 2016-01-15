@@ -365,13 +365,17 @@
   display: none;
 }
 .adress-popup .adress-popup-other-region {
-  margin-top: 1em;
+  margin-top: .5em;
+  line-height: 2em;
   padding-left: 21px;
   text-transform: uppercase;
   font-weight: 200;
   border-bottom: 1px solid;
   font-family: 'FuturaBookCRegular';
-  font-size: 1.3em;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #555;
+  border-color: #ccc;
 }
 .adress-popup .search-icon img {
   width: 18px;

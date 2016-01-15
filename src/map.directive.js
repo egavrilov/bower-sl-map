@@ -165,11 +165,7 @@ class MapController {
         outlets = this.remains && (this.remains[this.selectedSize] || this.remains[0]);
       }
 
-      if (this.isMobile) {
-        this.filtered = outlets;
-      }
-
-      if (this.selected || this.isMobile) {
+      if (this.selected) {
         return;
       }
 
@@ -177,6 +173,19 @@ class MapController {
 
       this.filtered = outlets.filter((outlet) =>
         bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1])));
+
+      if (this.outletsFilter) {
+        this.otherRegion = this.outlets.filter((outlet) => {
+          if (outlet.region_id.indexOf(this.model.location.id) !== -1) {
+            return false;
+          }
+
+          outlet.region_id.forEach(this.fetchRemains.bind(this, outlet));
+          return true;
+        });
+
+        return;
+      }
 
       this.otherRegion = this.outletsRemains &&
         this.outlets.filter((outlet) => {
