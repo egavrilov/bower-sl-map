@@ -109,8 +109,7 @@
     <div class="adress-popup-box-holder" ng-if="slMap.selected">
         <div class="adress-popup-box active">
             <a href="" class="adress-box-back" ng-show="slMap.isMobile" ng-click="slMap.back()" ><img src="/bower_components/sl-map/src/images/all/adress-arrow-right.png" alt=""></a>
-            <a href="" class="adress-box-close" ng-if="slMap.isMobile && !slMap.selected.remains"
-               ng-click="slMap.back()"><img src="/bower_components/sl-map/src/images/all/cross-grey.png" alt=""></a>
+            <a href="" class="adress-box-close" ng-click="slMap.back()"><img src="/bower_components/sl-map/src/images/all/cross-grey.png" alt=""></a>
             <div class="adress-popup-name"><span ng-bind="slMap.selected.mall">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind="slMap.selected.kind.name">гипермаркет</span></div>
             <div class="adress-popup-box-img" ng-show="slMap.constructor.getPrimary(slMap.selected.images)">
                 <img ng-src="{{slMap.constructor.getPrimary(slMap.selected.images).file}}" alt="">

@@ -86,7 +86,7 @@ class MapController {
     this.map.height = this.$window.outerHeight;
     this.model.location = this.Regions.current;
     this.defaultIcon = {
-      url: '/bower_components/sl-map/src/images/new/marker_full@2x.png',
+      url: '/bower_components/sl-map/src/images/new/map-red@2x.png',
       size: [24, 32],
       scaledSize: [24, 32],
       origin: [0, 0]
@@ -159,8 +159,8 @@ class MapController {
     }
 
     return angular.extend({}, this.defaultIcon, {
-      url: `/bower_components/sl-map/src/images/new/marker${
-          outlet.remains && outlet.remains.hasOwnProperty('available') ? '_green' : '_gray'
+      url: `/bower_components/sl-map/src/images/new/map${
+          outlet.remains && outlet.remains.hasOwnProperty('available') ? '-red' : '-gray'
         }@2x.png`
     });
   }
@@ -292,7 +292,7 @@ class MapController {
   openInfo(outlet) {
     this.selected = outlet;
     this.selected.icon = angular.extend({}, this.defaultIcon, {
-      url: '/bower_components/sl-map/src/images/new/marker-active.png'
+      url: '/bower_components/sl-map/src/images/new/map-white@2x.png'
     });
     this.$timeout(() => this.scroll());
 
