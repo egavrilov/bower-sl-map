@@ -117,11 +117,7 @@ class MapController {
         remains[remain.size] = [];
       }
       outlet.remains = remain;
-      outlet.icon = angular.extend({}, this.defaultIcon, {
-        url: `/bower_components/sl-map/src/images/new/marker${
-            outlet.remains && outlet.remains.hasOwnProperty('available') ? '_green' : '_gray'
-          }@2x.png`
-      });
+      outlet.icon = this.getIcon(outlet);
       remains[remain.size].push(outlet);
 
       return remains;
@@ -149,16 +145,23 @@ class MapController {
       this.outletsRemains.concat(response.data);
       outlet.remains = response.data.filter((_remain) =>
         _remain.outlet_id === outlet.id && Number(this.selectedSize) === _remain.size)[0];
-
-      outlet.icon = angular.extend({}, this.defaultIcon, {
-        url: `/bower_components/sl-map/src/images/new/marker${
-            outlet.remains && outlet.remains.hasOwnProperty('available') ? '_green' : '_gray'
-          }@2x.png`
-      });
+      outlet.icon = this.getIcon(outlet);
 
       if (!outlet.remains) {
         this.otherRegion.splice(index, 1);
       }
+    });
+  }
+
+  getIcon(outlet){
+    if (!this.outletsRemains) {
+      return this.defaultIcon;
+    }
+
+    return angular.extend({}, this.defaultIcon, {
+      url: `/bower_components/sl-map/src/images/new/marker${
+          outlet.remains && outlet.remains.hasOwnProperty('available') ? '_green' : '_gray'
+        }@2x.png`
     });
   }
 
@@ -272,7 +275,7 @@ class MapController {
 
   back() {
     if (this.selected) {
-      this.selected.icon = this.defaultIcon;
+      this.selected.icon = this.getIcon(this.selected);
       this.selected.selected = false;
       this.selected = null;
       this.map.setCenter(this._previousState.center);
