@@ -567,7 +567,7 @@
     position: absolute;
   }
 
-  .adress-box-close { display: none; }
+  /*.adress-box-close { display: none; }*/
   /*.adress-popup .search-icon {display: none;}*/
   .adress-popup .search-icon, .adress-popup .search-close {z-index: 70;}
   .adress-popup-search {
