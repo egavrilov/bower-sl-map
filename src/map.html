@@ -8,7 +8,11 @@
             <a href="" class="adress-tab adress-tab-map" ng-class="{'active': slMap.isMapActive}">НА КАРТЕ</a>
         </div>
         <div class="adress-popup-search">
-            <input class="input adress-popup-input" type="text" ng-model="slMap.outletsFilter" ng-change="slMap.resize()">
+            <input class="input adress-popup-input" ng-class="{'active': slMap.outletsFilter.length}"
+                   type="text"
+                   ng-model="slMap.outletsFilter"
+                   ng-change="slMap.resize()">
+            <span class="adress-input-clear" ng-show="slMap.outletsFilter" ng-click="slMap.outletsFilter = ''">&times;</span>
         </div>
         <div class="adress-popup-list" ng-show="!slMap.isMobile || !slMap.isMapActive">
             <div ng-repeat="outlet in slMap.filtered | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
@@ -31,13 +35,16 @@
                 </div>
                 <span class="adress-item-arrow"><img src="/bower_components/sl-map/src/images/all/adress-arrow-left.png" alt=""></span>
             </div>
-            <div ng-if="slMap.outletsFilter || slMap.otherRegion.length" class="adress-popup-other-region">В других регионах</div>
-            <div ng-repeat="outlet in slMap.otherRegion | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
+            <div ng-show="slMap.otherRegion.length" class="adress-popup-other-region">В других регионах</div>
+            <div ng-repeat="outlet in slMap.otherRegion | filter: slMap.outletsFilter | orderBy: 'kind.sort'"
                  ng-class="{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }"
                  ng-click="slMap.select(outlet)"
-                 ng-if="(slMap.outletsFilter || outlet.remains) && slMap.otherRegion"
+                 ng-show="slMap.otherRegion.length"
                  class="adress-popup-item">
-                <div class="adress-popup-name"><span ng-bind="::outlet.mall">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind="::outlet.kind.name">гипермаркет</span></div>
+                <div class="adress-popup-name">
+                    <span ng-bind="::outlet.mall">SUNLIGHT МЕГА Теплый Стан</span>
+                    <span ng-bind="::outlet.kind.name">гипермаркет</span>
+                </div>
                 <div class="adress-popup-street">
                     <span ng-bind="::outlet.address">Москва, улица Арбат, 12 с 1</span>
                     <div class="adress-popup-time" ng-bind="::outlet.opening_hours">ПН-ВС 10:00-22:00</div>
@@ -47,12 +54,14 @@
                     <span ng-bind="metro.name">Электрозаводская</span>
                 </div>
                 <div class="adress-popup-info" ng-if="outlet.remains">
-                    <span class="adress-popup-status adress-popup-status-green" ng-if="outlet.remains.available">В наличии</span>
+                    <span class="adress-popup-status adress-popup-status-green" ng-if="outlet.remains.hasOwnProperty('available')">В наличии</span>
                     <span class="adress-popup-status" ng-if="outlet.remains.pickup">Под заказ</span>
                     <span ng-if="outlet.remains.available !== false">Можно забрать <span ng-bind="::outlet.remains.pickup || 'сегодня'"></span></span>
                 </div>
                 <span class="adress-item-arrow"><img src="/bower_components/sl-map/src/images/all/adress-arrow-left.png" alt=""></span>
             </div>
+            <div ng-show="slMap.emptyList"
+                 class="adress-popup-empty-list ng-hide">По вашему запросу ничего не найдено.</div>
             <!--<div class="adress-popup-item adress-popup-item2 active" data-mark="adress-mark2" data-box="adress-box2">
                 <div class="adress-popup-name"><span>ТЦ РИО</span> СЕКция</div>
                 <div class="adress-popup-street">
@@ -83,7 +92,7 @@
     </div>
     <div class="adress-popup-right" ng-class="{'invisible': slMap.isMobile && !slMap.isMapActive}">
         <ng-map class="adress-popup-map" pan-control="true" pan-control-options="{position:'TOP_RIGHT'}" map-type-control="false" height="100%"
-                zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true"
+                zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true" on-zoom_changed="slMap.proxify(event, 'resize')"
                 on-bounds_changed="slMap.proxify(event, 'resize')" single-info-window="true" street-view-control="false"
                 center="[55.755773, 37.614608]">
             <!--<img src="/bower_components/sl-map/src/images/all/popup-map.jpg" alt="" class="adress-popup-map-img">-->
@@ -94,7 +103,7 @@
                     id="outlet_{{::outlet.id}}"
                     position="{{::outlet.geo}}"
                     on-click="slMap.proxify('select', outlet)"
-                    icon="{{outlet.icon || '/bower_components/sl-map/src/images/new/marker'+ (outlet.remains.available ? '-remains' : '') +'.png'}}">
+                    icon="{{outlet.icon || slMap.defaultIcon}}">
             </marker>
         </ng-map>
     </div>

@@ -139,6 +139,7 @@
 }
 .adress-popup-search {
   margin: 0 -1px;
+  position: relative;
 }
 .adress-popup .input {
   padding: 0 15px 0 35px;
@@ -147,7 +148,22 @@
   border-color: #e8e8e8;
   background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 50% 50% no-repeat;
 }
-.adress-popup .input:focus {background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 11px 50% no-repeat;}
+.adress-popup .input:focus, .adress-popup .input.active {background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 11px 50% no-repeat;}
+
+.adress-input-clear {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  height: 100%;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 2em;
+  font-weight: 100;
+  font-family: Verdana,Arial,sans-serif;
+  line-height: 2.5rem;
+  vertical-align: middle;
+}
+
 .adress-popup-left {
   overflow: hidden;
   float: left;
@@ -200,6 +216,14 @@
   background: #f8f8f8;
   border-left: 1px solid transparent;
   cursor: pointer;
+}
+.adress-popup-empty-list{
+  margin: 2em 1.5em 0;
+  text-align: center;
+  font-size: 1.2em;
+  font-family: 'FuturaBookCRegular';
+  text-transform: uppercase;
+  color: #ccc;
 }
 .adress-item-arrow {
   display: none;
@@ -545,9 +569,9 @@
 
   .adress-box-close { display: none; }
   /*.adress-popup .search-icon {display: none;}*/
-  .adress-popup .search-icon, .adress-popup .search-close {z-index: 20;}
+  .adress-popup .search-icon, .adress-popup .search-close {z-index: 70;}
   .adress-popup-search {
-    display: none;
+    display: none !important;
     position: absolute;
     top: 0;
     left: 0;
