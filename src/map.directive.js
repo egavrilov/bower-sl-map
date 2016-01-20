@@ -5,7 +5,8 @@ class Map {
     this.bindToController = {
       actionOutlets: '@slMapActionOutlets',
       outletsRemains: '@slMapFilter',
-      selectedSize: '@slMapRemainsSize'
+      selectedSize: '@slMapRemainsSize',
+      pawnshopType: '@slMapPawnshopType'
     };
     this.controller = MapController;
     this.controllerAs = 'slMap';
@@ -71,17 +72,20 @@ class MapController {
     };
 
     this.initRemains();
-    this.initAction();
+    this.initFilters();
     this.render();
   }
 
-  initAction(){
-    if (!this.actionOutlets) {
-      return;
+  initFilters(){
+    if (this.actionOutlets) {
+      this.outlets = this.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
+      this.model.outlets = this.model.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
     }
 
-    this.outlets = this.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
-    this.model.outlets = this.model.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
+    if (this.pawnshopType) {
+      this.outlets = this.outlets.filter((outlet) => outlet.pawnshop <= this.pawnshopType);
+      this.model.outlets = this.model.outlets.filter((outlet) => outlet.pawnshop <= this.pawnshopType);
+    }
   }
 
   initRemains() {
