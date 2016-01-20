@@ -77,6 +77,7 @@
 
 	  this.scope = true;
 	  this.bindToController = {
+	    actionOutlets: '@slMapActionOutlets',
 	    outletsRemains: '@slMapFilter',
 	    selectedSize: '@slMapRemainsSize'
 	  };
@@ -86,28 +87,6 @@
 	};
 
 	var MapController = (function () {
-
-	  /*
-	   Логика:
-	   - при выборе региона отображается ТТ региона
-	   - при отдалении карты - показываются в первую очередь ТТ выбранного региона
-	   - при поиске в первую очередь показываются ТТ выбранного региона
-	   - во вторую очередь в перечисленных случаях отображаются ТТ других регионов отсортированные по типу
-	   - От первой очереди вторая отделена подчеркнутым заголовком "В других регионах"
-	   Техника:
-	   - запрос точек по региону при ините
-	   - отрисовка точек по всей россии
-	   - добавление точек по региону в список справа
-	   - при поиске по названию/адресу - поиск среди всех точек по РФ
-	   - при выборе точки показывать список ТТ региона (если поле поиска пустое) или оставлять найденные ТТ (если заполнено поле поиска)
-	   - при зуме (и отсутствии выбранной точки) показывать точки которые находятся на карте
-	   - если включены остатки, показывать остатки по региону, когда увеличиваем зум и попадаем на точки другого региона - добавляем к ним остатки запросом в батч
-	    TODO:
-	   -- вернуть увеличение списка при отдалении
-	   -- крестик вынести за попап
-	   -- переключение на карту мобильный вид
-	   -- отцентровать активную иконку
-	   */
 
 	  /**
 	   @ngInject
@@ -173,7 +152,24 @@
 	      };
 
 	      this.initRemains();
+	      this.initAction();
 	      this.render();
+	    }
+	  }, {
+	    key: 'initAction',
+	    value: function initAction() {
+	      var _this2 = this;
+
+	      if (!this.actionOutlets) {
+	        return;
+	      }
+
+	      this.outlets = this.outlets.filter(function (outlet) {
+	        return new RegExp(outlet.id).test(_this2.actionOutlets);
+	      });
+	      this.model.outlets = this.model.outlets.filter(function (outlet) {
+	        return new RegExp(outlet.id).test(_this2.actionOutlets);
+	      });
 	    }
 	  }, {
 	    key: 'initRemains',
@@ -188,10 +184,10 @@
 	  }, {
 	    key: 'reduceBySize',
 	    value: function reduceBySize(remainsArr) {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      var remains = remainsArr.reduce(function (remains, remain) {
-	        var outlet = _this2.model.outlets.filter(function (_outlet) {
+	        var outlet = _this3.model.outlets.filter(function (_outlet) {
 	          return _outlet.id === remain.outlet_id;
 	        })[0];
 	        if (!outlet || !remain.hasOwnProperty('available') && !remain.pickup) {
@@ -201,7 +197,7 @@
 	          remains[remain.size] = [];
 	        }
 	        outlet.remains = remain;
-	        outlet.icon = _this2.getIcon(outlet);
+	        outlet.icon = _this3.getIcon(outlet);
 	        remains[remain.size].push(outlet);
 
 	        return remains;
@@ -227,17 +223,17 @@
 	  }, {
 	    key: 'fetchRemains',
 	    value: function fetchRemains(outlet, regionId, index) {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      return this.Remains.fetch(null, regionId).then(function (response) {
-	        _this3.outletsRemains.concat(response.data);
+	        _this4.outletsRemains.concat(response.data);
 	        outlet.remains = response.data.filter(function (_remain) {
-	          return _remain.outlet_id === outlet.id && Number(_this3.selectedSize) === _remain.size;
+	          return _remain.outlet_id === outlet.id && Number(_this4.selectedSize) === _remain.size;
 	        })[0];
-	        outlet.icon = _this3.getIcon(outlet);
+	        outlet.icon = _this4.getIcon(outlet);
 
 	        if (!outlet.remains) {
-	          _this3.otherRegion.splice(index, 1);
+	          _this4.otherRegion.splice(index, 1);
 	        }
 	      });
 	    }
@@ -264,65 +260,65 @@
 	  }, {
 	    key: 'resize',
 	    value: function resize() {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      if (this._resizeTimeout) this.$timeout.cancel(this._resizeTimeout);
 
 	      this._resizeTimeout = this.$timeout(function () {
-	        var outlets = _this4.model.outlets;
+	        var outlets = _this5.model.outlets;
 
-	        if (_this4.outletsRemains) {
-	          outlets = _this4.remains && (_this4.remains[_this4.selectedSize] || _this4.remains[0]);
+	        if (_this5.outletsRemains) {
+	          outlets = _this5.remains && (_this5.remains[_this5.selectedSize] || _this5.remains[0]);
 	        }
 
-	        if (_this4.selected && _this4.map.zoom >= 14) {
+	        if (_this5.selected && _this5.map.zoom >= 14) {
 	          return;
 	        }
 
-	        var bounds = _this4.map.getBounds();
+	        var bounds = _this5.map.getBounds();
 
-	        _this4.filtered = outlets.filter(function (outlet) {
-	          return bounds.contains(_this4.gm('LatLng', outlet.geo[0], outlet.geo[1]));
+	        _this5.filtered = outlets.filter(function (outlet) {
+	          return bounds.contains(_this5.gm('LatLng', outlet.geo[0], outlet.geo[1]));
 	        });
 
-	        if (_this4.outletsFilter) {
-	          _this4.otherRegion = _this4.outlets.filter(function (outlet) {
-	            if (outlet.region_id[0] === _this4.model.location.id) {
+	        if (_this5.outletsFilter) {
+	          _this5.otherRegion = _this5.outlets.filter(function (outlet) {
+	            if (outlet.region_id[0] === _this5.model.location.id) {
 	              return false;
 	            }
 
-	            _this4.fetchRemains(outlet, outlet.region_id[0]);
+	            _this5.fetchRemains(outlet, outlet.region_id[0]);
 	            return true;
 	          });
 
 	          return;
 	        }
 
-	        _this4.otherRegion = _this4.outlets.filter(function (outlet) {
-	          if (outlet.region_id[0] === _this4.model.location.id) return;
+	        _this5.otherRegion = _this5.outlets.filter(function (outlet) {
+	          if (outlet.region_id[0] === _this5.model.location.id) return;
 
-	          if (!bounds.contains(_this4.gm('LatLng', outlet.geo[0], outlet.geo[1]))) return;
+	          if (!bounds.contains(_this5.gm('LatLng', outlet.geo[0], outlet.geo[1]))) return;
 
-	          if (_this4.outletsRemains) {
-	            _this4.fetchRemains(outlet, outlet.region_id[0]);
+	          if (_this5.outletsRemains) {
+	            _this5.fetchRemains(outlet, outlet.region_id[0]);
 	          }
 	          return true;
 	        });
 
-	        _this4.emptyList = !_this4.otherRegion.length && !_this4.filtered.length;
+	        _this5.emptyList = !_this5.otherRegion.length && !_this5.filtered.length;
 	      }, 450);
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this5 = this;
+	      var _this6 = this;
 
 	      if (!this.model.outlets) return;
 	      this.bounds = this.gm('LatLngBounds');
 	      this.model.outlets.forEach(function (outlet) {
 	        if (outlet.geo && outlet.geo.length) {
-	          var marker = _this5.gm('LatLng', outlet.geo[0], outlet.geo[1]);
-	          _this5.bounds.extend(marker);
+	          var marker = _this6.gm('LatLng', outlet.geo[0], outlet.geo[1]);
+	          _this6.bounds.extend(marker);
 	        }
 	      });
 	      this.$window.google.maps.event.trigger(this.map, 'resize');
@@ -387,14 +383,14 @@
 	  }, {
 	    key: 'openInfo',
 	    value: function openInfo(outlet) {
-	      var _this6 = this;
+	      var _this7 = this;
 
 	      this.selected = outlet;
 	      this.selected.icon = angular.extend({}, this.defaultIcon, {
 	        url: '/bower_components/sl-map/src/images/new/map-white@2x.png'
 	      });
 	      this.$timeout(function () {
-	        return _this6.scroll();
+	        return _this7.scroll();
 	      });
 
 	      if (this.map.lastInfoWindow && this.map.lastInfoWindow !== outlet) {
@@ -427,13 +423,13 @@
 	  }, {
 	    key: 'showcase',
 	    value: function showcase(refresh) {
-	      var _this7 = this;
+	      var _this8 = this;
 
 	      if (refresh) {
 	        this._showcase = refresh;
 	        this.$timeout(function () {
-	          _this7.render();
-	          _this7.select();
+	          _this8.render();
+	          _this8.select();
 	        });
 	      }
 
