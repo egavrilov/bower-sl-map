@@ -64,7 +64,7 @@ class MapController {
     this.map.height = this.$window.outerHeight;
     this.model.location = this.Regions.current;
     this.defaultIcon = {
-      url: '/bower_components/sl-map/src/images/new/map-red@2x.png',
+      url: '/bower_components/sl-map/src/images/new/map-gray@2x.png',
       size: [24, 32],
       scaledSize: [24, 32],
       origin: [0, 0]

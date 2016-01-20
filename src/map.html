@@ -61,32 +61,6 @@
             </div>
             <div ng-show="slMap.emptyList"
                  class="adress-popup-empty-list ng-hide">По вашему запросу ничего не найдено.</div>
-            <!--<div class="adress-popup-item adress-popup-item2 active" data-mark="adress-mark2" data-box="adress-box2">
-                <div class="adress-popup-name"><span>ТЦ РИО</span> СЕКция</div>
-                <div class="adress-popup-street">
-                    Москва, Мажоритарный пр. 8
-                    <div class="adress-popup-time">10:00-22:00</div>
-                </div>
-                <div class="adress-popup-metro">Электрозаводская</div>
-                <div class="adress-popup-info">
-                    <span class="adress-popup-status adress-popup-status-green">В наличии</span>
-                    Можно забрать прямо сейчас
-                </div>
-                <span class="adress-item-arrow"><img src="/bower_components/sl-map/src/images/all/adress-arrow-left.png" alt=""></span>
-            </div>
-            <div class="adress-popup-item adress-popup-item3" data-mark="adress-mark3" data-box="adress-box3">
-                <div class="adress-popup-name"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>
-                <div class="adress-popup-street">
-                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ
-                    <div class="adress-popup-time">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>
-                </div>
-                <div class="adress-popup-metro">Электрозаводская</div>
-                <div class="adress-popup-info">
-                    <span class="adress-popup-status">Под заказ</span>
-                    Можно забрать завтра
-                </div>
-                <span class="adress-item-arrow"><img src="/bower_components/sl-map/src/images/all/adress-arrow-left.png" alt=""></span>
-            </div>-->
         </div>
     </div>
     <div class="adress-popup-right" ng-class="{'invisible': slMap.isMobile && !slMap.isMapActive}">
@@ -94,7 +68,6 @@
                 zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true" on-zoom_changed="slMap.proxify(event, 'resize')"
                 on-bounds_changed="slMap.proxify(event, 'resize')" single-info-window="true" street-view-control="false"
                 center="[55.755773, 37.614608]">
-            <!--<img src="/bower_components/sl-map/src/images/all/popup-map.jpg" alt="" class="adress-popup-map-img">-->
             <a href="" class="adress-mark adress-mark1" data-item="adress-popup-item1" data-box="adress-box1"></a>
             <a href="" class="adress-mark adress-mark2 active" data-item="adress-popup-item2" data-box="adress-box2"></a>
             <a href="" class="adress-mark adress-mark3" data-item="adress-popup-item3" data-box="adress-box3"></a>
@@ -127,48 +100,8 @@
                     <span class="adress-popup-status">Под заказ</span>
                     Можно забрать 24 сентября
                 </div>
-                <a href="" class="button" ng-if="slMap.selected.remains" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАРЕЗЕРВИРОВАТЬ</a>
+                <a href="" class="button" ng-if="slMap.selected.remains" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАКАЗАТЬ</a>
             </div>
         </div>
-        <!--<div class="adress-popup-box adress-box2 active">
-            <a href="" class="adress-box-back"><img src="/bower_components/sl-map/src/images/all/adress-arrow-right.png" alt=""></a>
-            <a href="" class="adress-box-close"><img src="/bower_components/sl-map/src/images/all/cross-grey.png" alt=""></a>
-            <div class="adress-popup-name"><span>ТЦ РИО</span> СЕКция</div>
-            <div class="adress-popup-box-img">
-                <img src="/bower_components/sl-map/src/images/all/adress-img1.jpg" alt="">
-            </div>
-            <div class="adress-popup-box-text">
-                <div class="adress-popup-street">
-                    Москва, Мажоритарный пр. 8
-                    <div class="adress-popup-time">10:00-22:00</div>
-                </div>
-                <div class="adress-popup-metro">Электрозаводская</div>
-                <div class="adress-popup-info">
-                    <span class="adress-popup-status adress-popup-status-green">В наличии</span>
-                    Можно забрать прямо сейчас
-                </div>
-                <a href="" class="button">ЗАРЕЗЕРВИРОВАТЬ</a>
-            </div>
-        </div>
-        <div class="adress-popup-box adress-box3">
-            <a href="" class="adress-box-back"><img src="/bower_components/sl-map/src/images/all/adress-arrow-right.png" alt=""></a>
-            <a href="" class="adress-box-close"><img src="/bower_components/sl-map/src/images/all/cross-grey.png" alt=""></a>
-            <div class="adress-popup-name"><span>SUNLIGHT БОРОДИЩЕВО</span> МИНИмаркет</div>
-            <div class="adress-popup-box-img">
-                <img src="/bower_components/sl-map/src/images/all/adress-img1.jpg" alt="">
-            </div>
-            <div class="adress-popup-box-text">
-                <div class="adress-popup-street">
-                    Загопниковская, д. 507 корпус 501, ТЦ ИЮНЬ
-                    <div class="adress-popup-time">ПН-ВС 10:00-22:00, СБ-ВС 11:00-12:00</div>
-                </div>
-                <div class="adress-popup-metro">Электрозаводская</div>
-                <div class="adress-popup-info">
-                    <span class="adress-popup-status">Под заказ</span>
-                    Можно забрать завтра
-                </div>
-                <a href="" class="button">ЗАРЕЗЕРВИРОВАТЬ</a>
-            </div>
-        </div>-->
     </div>
 </div>
