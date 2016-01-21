@@ -49,6 +49,7 @@ class MapController {
   }
 
   init() {
+    console.time('some');
     this.$q.all({
       regions: this.Regions.fetch(),
       outlets: this.Outlets.fetch(),
@@ -71,9 +72,70 @@ class MapController {
       origin: [0, 0]
     };
 
-    this.initRemains();
-    this.initFilters();
+    this.outletsRemains ?
+      this.listRemains() :
+      this.listOutlets();
+    //this.initRemains();
+    //this.initFilters();
     this.render();
+  }
+
+  listRemains() {
+    this.outletsRemains = angular
+      .fromJson(this.outletsRemains)
+      .reduce(this.joinRemainOutlet.bind(this), {});
+    this.otherRegions = [];
+    this.updateRemains();
+  }
+
+  updateRemains() {
+    let remainsQueue = {};
+    this.currentRegion = this.outletsRemains.filter(this.belongsToMap.bind(this));
+
+    this.outlets.filter((outlet) => {
+      let region = outlet.region_id[0];
+      if (region === this.model.location.id || !this.belongsToMap(outlet))  {
+        return false;
+      }
+
+      remainsQueue[region] = this.fetchRemains(outlet, region);
+    });
+  }
+
+  listOutlets(){
+
+  }
+
+  belongsToMap(outlet) {
+    let bounds = this.map.getBounds();
+    return bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
+  }
+
+  joinRemainOutlet(remains, remain) {
+    if (!remains[remain.size]) {
+      remains[remains.size] = {};
+    }
+
+    let currentSize = remains[remain.size];
+    let outletData = this.Outlets.getId(remain.outlet_id);
+
+    if (outletData) {
+      outletData.remains = remain;
+      currentSize[remain.outlet_id] = outletData;
+    }
+
+    return remains;
+  }
+
+  initRemains() {
+    this.outletsRemains = this.outletsRemains && angular.fromJson(this.outletsRemains);
+    this.model.outlets = this.outletsRemains ?
+      this.Outlets.byRegion(this.model.location.id).filter(this.filterRemains.bind(this)) :
+      this.Outlets.byRegion(this.model.location.id);
+
+    if (!this.outletsRemains) return;
+
+    this.remains = this.reduceBySize(this.outletsRemains);
   }
 
   initFilters(){
@@ -88,21 +150,10 @@ class MapController {
     }
   }
 
-  initRemains() {
-    this.outletsRemains = this.outletsRemains && angular.fromJson(this.outletsRemains);
-    this.model.outlets = this.outletsRemains ?
-      this.Outlets.byRegion(this.model.location.id).filter(this.filterRemains.bind(this)) :
-      this.Outlets.byRegion(this.model.location.id);
-
-    if (!this.outletsRemains) return;
-
-    this.remains = this.reduceBySize(this.outletsRemains);
-  }
-
   reduceBySize(remainsArr) {
     const remains = remainsArr.reduce((remains, remain) => {
-      let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
-      if (!outlet || !remain.hasOwnProperty('available') && !remain.pickup) {
+      let outlet = this.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
+      if (!outlet || (!remain.hasOwnProperty('available') && !remain.pickup)) {
         return remains;
       }
       if (!remains[remain.size]) {
@@ -132,16 +183,17 @@ class MapController {
     return this.model.outlets;
   }
 
-  fetchRemains(outlet, regionId, index) {
+  fetchRemains(outlet, regionId) {
     return this.Remains.fetch(null, regionId).then((response) => {
-      this.outletsRemains.concat(response.data);
+      //this.outletsRemains.concat(response.data);
       outlet.remains = response.data.filter((_remain) =>
         _remain.outlet_id === outlet.id && Number(this.selectedSize) === _remain.size)[0];
       outlet.icon = this.getIcon(outlet);
 
-      if (!outlet.remains) {
-        this.otherRegion.splice(index, 1);
-      }
+      //if (!outlet.remains) {
+      //  this.otherRegion.splice(this.otherRegion.findIndex((_outlet) => outlet.id === _outlet.id), 1);
+      //  console.timeEnd('some');
+      //}
     });
   }
 

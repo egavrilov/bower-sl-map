@@ -53,7 +53,7 @@
                     <span ng-bind="metro.name">Электрозаводская</span>
                 </div>
                 <div class="adress-popup-info" ng-if="outlet.remains">
-                    <span class="adress-popup-status adress-popup-status-green" ng-if="outlet.remains.hasOwnProperty('available')">В наличии</span>
+                    <span class="adress-popup-status adress-popup-status-green" ng-if="!outlet.remains.pickup">В наличии</span>
                     <span class="adress-popup-status" ng-if="outlet.remains.pickup">Под заказ</span>
                     <span ng-if="outlet.remains.available !== false">Можно забрать <span ng-bind="::outlet.remains.pickup || 'сегодня'"></span></span>
                 </div>
@@ -100,7 +100,8 @@
                     <span class="adress-popup-status">Под заказ</span>
                     Можно забрать 24 сентября
                 </div>
-                <a href="" class="button" ng-if="slMap.selected.remains" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАКАЗАТЬ</a>
+                <a href="" class="button" ng-if="slMap.selected.remains.available" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАРЕЗЕРВИРОВАТЬ</a>
+                <a href="" class="button" ng-if="slMap.selected.remains.pickup" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАКАЗАТЬ</a>
             </div>
         </div>
     </div>
