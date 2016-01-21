@@ -17,6 +17,7 @@
             <div ng-repeat="outlet in slMap.filtered | filter: slMap.outletsFilter | orderBy: ['remains.available', 'kind.sort']"
                  ng-class="{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }"
                  ng-click="slMap.select(outlet)"
+                 ng-show="!slMap.outletsRemains || outlet.remains"
                  class="adress-popup-item">
                 <div class="adress-popup-name"><span ng-bind="::outlet.mall">SUNLIGHT МЕГА Теплый Стан</span> <span ng-bind="::outlet.kind.name">гипермаркет</span></div>
                 <div class="adress-popup-street">
@@ -38,7 +39,7 @@
             <div ng-repeat="outlet in slMap.otherRegion | filter: slMap.outletsFilter | orderBy: 'kind.sort'"
                  ng-class="{'active': outlet.selected, 'address-popup-list_remains': outlet.remains }"
                  ng-click="slMap.select(outlet)"
-                 ng-show="slMap.otherRegion.length"
+                 ng-show="!slMap.outletsRemains || outlet.remains"
                  class="adress-popup-item">
                 <div class="adress-popup-name">
                     <span ng-bind="::outlet.mall">SUNLIGHT МЕГА Теплый Стан</span>
@@ -102,6 +103,7 @@
                 </div>
                 <a href="" class="button" ng-if="slMap.selected.remains.available" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАРЕЗЕРВИРОВАТЬ</a>
                 <a href="" class="button" ng-if="slMap.selected.remains.pickup" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАКАЗАТЬ</a>
+                <a href="" class="button" ng-if="slMap.selected.remains.available === false" disabled>В НАЛИЧИИ</a>
             </div>
         </div>
     </div>
