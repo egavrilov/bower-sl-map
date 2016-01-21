@@ -105,11 +105,15 @@
   color: #fff;
   background: #f00;
 }
-.button:disabled {
+.button[disabled] {
   color: #b2b2b2;
   border: 1px solid #b2b2b2;
 }
-
+.button[disabled]:hover {
+  background: #fff;
+  color: #bfbfbf;
+  border-color: #bfbfbf;
+}
 
 
 /************************* popup styles *************************/
