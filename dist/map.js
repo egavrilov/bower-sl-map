@@ -172,10 +172,10 @@
 
 	      if (this.pawnshopType) {
 	        this.outlets = this.outlets.filter(function (outlet) {
-	          return outlet.pawnshop <= _this2.pawnshopType;
+	          return outlet.pawnshop >= _this2.pawnshopType;
 	        });
 	        this.model.outlets = this.model.outlets.filter(function (outlet) {
-	          return outlet.pawnshop <= _this2.pawnshopType;
+	          return outlet.pawnshop >= _this2.pawnshopType;
 	        });
 	      }
 	    }

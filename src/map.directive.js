@@ -84,7 +84,7 @@ class MapController {
 
     if (this.pawnshopType) {
       this.outlets = this.outlets.filter((outlet) => outlet.pawnshop >= this.pawnshopType);
-      this.model.outlets = this.model.outlets.filter((outlet) => outlet.pawnshop <= this.pawnshopType);
+      this.model.outlets = this.model.outlets.filter((outlet) => outlet.pawnshop >= this.pawnshopType);
     }
   }
 
