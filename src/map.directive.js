@@ -3,7 +3,6 @@ class Map {
   constructor() {
     this.scope = true;
     this.bindToController = {
-      actionId: '@slMapActionId',
       actionOutlets: '@slMapActionOutlets',
       outletsRemains: '@slMapFilter',
       selectedSize: '@slMapRemainsSize',
@@ -47,29 +46,20 @@ class MapController {
       this.model.location = Regions.current;
       this.init();
     });
-
-    $scope.$on('$destroy', () => {
-      if ( this.selected ) {
-        this.select(this.selected);
-        this.selected = null;
-      }
-    });
   }
 
   init() {
+    console.time('some');
     this.$q.all({
       regions: this.Regions.fetch(),
       outlets: this.Outlets.fetch(),
       map: this.NgMap.getMap()
-    }).then((responses) => {
-      this.setModel(responses);
-      this.model.loaded = true;
-    });
+    }).then(this.setModel.bind(this));
   }
 
   setModel(responses) {
     this.regions = this.Regions.all;
-    this.outlets = responses.outlets.filter(outlet => outlet.geo);
+    this.outlets = responses.outlets;
     this.map = responses.map;
     this.map._controller = this;
     this.map.width = this.$window.outerWidth;
@@ -82,29 +72,59 @@ class MapController {
       origin: [0, 0]
     };
 
-    this.initRemains();
-    this.initFilters();
+    this.outletsRemains ?
+      this.listRemains() :
+      this.listOutlets();
+    //this.initRemains();
+    //this.initFilters();
     this.render();
   }
 
-  initFilters() {
-    if (this.actionId && !this.actionOutlets) {
-      this.$http(`http://api.love.sl/v1/actions/actions/${this.actionId}`).then((action) => {
-        const outlets = action.outlets;
-        this.outlets = this.outlets.filter((_outlet) => outlets.indexOf(_outlet) !== -1);
-        this.model.outlets = this.model.outlets.filter((_outlet) => outlets.indexOf(_outlet) !== -1);
-      });
+  listRemains() {
+    this.outletsRemains = angular
+      .fromJson(this.outletsRemains)
+      .reduce(this.joinRemainOutlet.bind(this), {});
+    this.otherRegions = [];
+    this.updateRemains();
+  }
+
+  updateRemains() {
+    let remainsQueue = {};
+    this.currentRegion = this.outletsRemains.filter(this.belongsToMap.bind(this));
+
+    this.outlets.filter((outlet) => {
+      let region = outlet.region_id[0];
+      if (region === this.model.location.id || !this.belongsToMap(outlet))  {
+        return false;
+      }
+
+      remainsQueue[region] = this.fetchRemains(outlet, region);
+    });
+  }
+
+  listOutlets(){
+
+  }
+
+  belongsToMap(outlet) {
+    let bounds = this.map.getBounds();
+    return bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1]));
+  }
+
+  joinRemainOutlet(remains, remain) {
+    if (!remains[remain.size]) {
+      remains[remains.size] = {};
     }
 
-    if (this.actionOutlets) {
-      this.outlets = this.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
-      this.model.outlets = this.model.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
+    let currentSize = remains[remain.size];
+    let outletData = this.Outlets.getId(remain.outlet_id);
+
+    if (outletData) {
+      outletData.remains = remain;
+      currentSize[remain.outlet_id] = outletData;
     }
 
-    if (this.pawnshopType) {
-      this.outlets = this.outlets.filter((outlet) => outlet.pawnshop >= this.pawnshopType);
-      this.model.outlets = this.model.outlets.filter((outlet) => outlet.pawnshop >= this.pawnshopType);
-    }
+    return remains;
   }
 
   initRemains() {
@@ -118,10 +138,22 @@ class MapController {
     this.remains = this.reduceBySize(this.outletsRemains);
   }
 
+  initFilters(){
+    if (this.actionOutlets) {
+      this.outlets = this.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
+      this.model.outlets = this.model.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
+    }
+
+    if (this.pawnshopType) {
+      this.outlets = this.outlets.filter((outlet) => outlet.pawnshop <= this.pawnshopType);
+      this.model.outlets = this.model.outlets.filter((outlet) => outlet.pawnshop <= this.pawnshopType);
+    }
+  }
+
   reduceBySize(remainsArr) {
     const remains = remainsArr.reduce((remains, remain) => {
-      let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
-      if (!outlet || !remain.hasOwnProperty('available') && !remain.pickup) {
+      let outlet = this.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
+      if (!outlet || (!remain.hasOwnProperty('available') && !remain.pickup)) {
         return remains;
       }
       if (!remains[remain.size]) {
@@ -151,16 +183,17 @@ class MapController {
     return this.model.outlets;
   }
 
-  fetchRemains(outlet, regionId, index) {
+  fetchRemains(outlet, regionId) {
     return this.Remains.fetch(null, regionId).then((response) => {
-      this.outletsRemains.concat(response.data);
+      //this.outletsRemains.concat(response.data);
       outlet.remains = response.data.filter((_remain) =>
         _remain.outlet_id === outlet.id && Number(this.selectedSize) === _remain.size)[0];
       outlet.icon = this.getIcon(outlet);
 
-      if (!outlet.remains) {
-        this.otherRegion.splice(index, 1);
-      }
+      //if (!outlet.remains) {
+      //  this.otherRegion.splice(this.otherRegion.findIndex((_outlet) => outlet.id === _outlet.id), 1);
+      //  console.timeEnd('some');
+      //}
     });
   }
 
