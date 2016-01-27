@@ -1,5 +1,5 @@
 <div class="loader" ng-show="!slMap.map"></div>
-<div class="adress-popup" map-lazy-load="http://maps.google.com/maps/api/js" ng-init="slMap.init()">
+<div class="adress-popup" ng-class="{ 'adress-popup_loading': !slMap.model.loaded }" map-lazy-load="http://maps.google.com/maps/api/js" ng-init="slMap.init()">
     <div class="adress-popup-left active">
         <h3 class="adress-popup-title">Где забрать?</h3>
         <div class="adress-popup-tabs" ng-click="slMap.isMobile && (slMap.isMapActive = !slMap.isMapActive)">
@@ -69,9 +69,6 @@
                 zoom-control="true" zoom-control-options="{style:'LARGE', position:'LEFT_TOP'}" scale-control="true" on-zoom_changed="slMap.proxify(event, 'resize')"
                 on-bounds_changed="slMap.proxify(event, 'resize')" single-info-window="true" street-view-control="false"
                 center="[55.755773, 37.614608]">
-            <a href="" class="adress-mark adress-mark1" data-item="adress-popup-item1" data-box="adress-box1"></a>
-            <a href="" class="adress-mark adress-mark2 active" data-item="adress-popup-item2" data-box="adress-box2"></a>
-            <a href="" class="adress-mark adress-mark3" data-item="adress-popup-item3" data-box="adress-box3"></a>
             <marker ng-repeat="outlet in slMap.outlets | filter: slMap.outletsFilter"
                     id="outlet_{{::outlet.id}}"
                     position="{{::outlet.geo}}"
