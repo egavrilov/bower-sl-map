@@ -104,6 +104,7 @@
                 <a href="" class="button" ng-if="slMap.selected.remains.available" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАРЕЗЕРВИРОВАТЬ</a>
                 <a href="" class="button" ng-if="slMap.selected.remains.pickup" ng-click="reserve.openReserveDialog(slMap.selected.remains)">ЗАКАЗАТЬ</a>
                 <a href="" class="button" ng-if="slMap.selected.remains.available === false" disabled="disabled">В НАЛИЧИИ</a>
+                <span href="" class="button" ng-if="slMap.outletsRemains && !slMap.selected.remains" disabled="disabled">НЕТ В НАЛИЧИИ</span>
             </div>
         </div>
     </div>

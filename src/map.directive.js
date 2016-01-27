@@ -46,6 +46,13 @@ class MapController {
       this.model.location = Regions.current;
       this.init();
     });
+
+    $scope.$on('$destroy', () => {
+      if ( this.selected ) {
+        this.select(this.selected);
+        this.selected = null;
+      }
+    });
   }
 
   init() {
