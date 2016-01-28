@@ -142,8 +142,8 @@
 	        regions: this.Regions.fetch(),
 	        outlets: this.Outlets.fetch(),
 	        map: this.NgMap.getMap()
-	      }).then(function () {
-	        _this2.setModel();
+	      }).then(function (responses) {
+	        _this2.setModel(responses);
 	        _this2.model.loaded = true;
 	      });
 	    }

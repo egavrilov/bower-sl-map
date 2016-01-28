@@ -60,8 +60,8 @@ class MapController {
       regions: this.Regions.fetch(),
       outlets: this.Outlets.fetch(),
       map: this.NgMap.getMap()
-    }).then(() => {
-      this.setModel();
+    }).then((responses) => {
+      this.setModel(responses);
       this.model.loaded = true;
     });
   }
