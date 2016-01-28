@@ -68,7 +68,7 @@ class MapController {
 
   setModel(responses) {
     this.regions = this.Regions.all;
-    this.outlets = responses.outlets;
+    this.outlets = responses.outlets.filter(outlet => outlet.geo);
     this.map = responses.map;
     this.map._controller = this;
     this.map.width = this.$window.outerWidth;

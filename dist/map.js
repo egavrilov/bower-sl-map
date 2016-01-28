@@ -151,7 +151,9 @@
 	    key: 'setModel',
 	    value: function setModel(responses) {
 	      this.regions = this.Regions.all;
-	      this.outlets = responses.outlets;
+	      this.outlets = responses.outlets.filter(function (outlet) {
+	        return outlet.geo;
+	      });
 	      this.map = responses.map;
 	      this.map._controller = this;
 	      this.map.width = this.$window.outerWidth;
