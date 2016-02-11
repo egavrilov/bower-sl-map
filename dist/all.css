@@ -556,16 +556,12 @@
   }
   .adress-popup-right.active {display: block;}
   .adress-popup-right.invisible .adress-popup-map { visibility: hidden;}
-  .adress-popup-map { width: auto; }
+  .adress-popup-map { width: auto; height: 656px; }
   .adress-popup-list {
     display: none;
     height: calc(100% - 60px);
   }
   .adress-popup-left.active .adress-popup-list {display: block;}
-  .adress-popup-search {
-    display: none;
-    margin: 0;
-  }
   .adress-popup-map-img {margin-top: -40px;}
   .adress-mark1 {top: 126px;}
   .adress-mark2 {top: 256px;}
@@ -586,8 +582,8 @@
   /*.adress-popup .search-icon {display: none;}*/
   .adress-popup .search-icon, .adress-popup .search-close {z-index: 70;}
   .adress-popup-search {
-    display: none !important;
-    position: absolute;
+    /*display: none !important;*/
+    /*position: absolute;*/
     top: 0;
     left: 0;
     right: 0;

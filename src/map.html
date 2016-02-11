@@ -6,7 +6,7 @@
             <a href="" class="adress-tab adress-tab-list" ng-class="{'active': !slMap.isMapActive}">Список</a>
             <a href="" class="adress-tab adress-tab-map" ng-class="{'active': slMap.isMapActive}">НА КАРТЕ</a>
         </div>
-        <div class="adress-popup-search">
+        <div class="adress-popup-search" ng-show="!slMap.isMobile || !slMap.isMapActive">
             <input class="input adress-popup-input" ng-class="{'active': slMap.outletsFilter.length}"
                    type="text"
                    ng-model="slMap.outletsFilter"
