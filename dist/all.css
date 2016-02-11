@@ -165,6 +165,7 @@
 .adress-popup .input:focus, .adress-popup .input.active {background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 11px 50% no-repeat;}
 
 .adress-input-clear {
+  width: 1em;
   position: absolute;
   top: 0;
   right: 2px;
@@ -554,6 +555,9 @@
     top: 90px;
     margin: 0;
   }
+  .adress-popup-item {
+    padding: 15px 15px 15px 10px;
+  }
   .adress-popup-right.active {display: block;}
   .adress-popup-right.invisible .adress-popup-map { visibility: hidden;}
   .adress-popup-map { width: auto; height: 656px; }
@@ -589,6 +593,7 @@
     right: 0;
     z-index: 100;
     margin: 0;
+    border-top: none;
   }
 }
 @media screen and (max-width: 640px) {
