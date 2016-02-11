@@ -23,8 +23,10 @@
   "dependencies": {
     "ngmap": "~1.14.15",
     "angular": "~1.4.8",
-    "bootstrap": "~4.0.0-alpha",
-    "sl-outlets": "https://egavrilov@bitbucket.org/egavrilov/bower-sl-outlets.git",
-    "sl-regions": "https://egavrilov@bitbucket.org/egavrilov/bower-sl-regions.git"
+    "sl-outlets": "https://egavrilov@bitbucket.org/sunlight_team/bower-sl-outlets.git",
+    "sl-regions": "https://egavrilov@bitbucket.org/sunlight_team/bower-sl-regions.git"
+  },
+  "devDependencies": {
+    "bootstrap": "~4.0.0-alpha"
   }
 }

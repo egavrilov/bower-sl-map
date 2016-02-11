@@ -3,6 +3,7 @@ class Map {
   constructor() {
     this.scope = true;
     this.bindToController = {
+      actionId: '@slMapActionId',
       actionOutlets: '@slMapActionOutlets',
       outletsRemains: '@slMapFilter',
       selectedSize: '@slMapRemainsSize',
@@ -86,7 +87,15 @@ class MapController {
     this.render();
   }
 
-  initFilters(){
+  initFilters() {
+    if (this.actionId && !this.actionOutlets) {
+      this.$http(`http://api.love.sl/v1/actions/actions/${this.actionId}`).then((action) => {
+        const outlets = action.outlets;
+        this.outlets = this.outlets.filter((_outlet) => outlets.indexOf(_outlet) !== -1);
+        this.model.outlets = this.model.outlets.filter((_outlet) => outlets.indexOf(_outlet) !== -1);
+      });
+    }
+
     if (this.actionOutlets) {
       this.outlets = this.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
       this.model.outlets = this.model.outlets.filter((outlet) => new RegExp(outlet.id).test(this.actionOutlets));
