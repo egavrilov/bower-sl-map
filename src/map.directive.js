@@ -119,7 +119,7 @@ class MapController {
   }
 
   reduceBySize(remainsArr) {
-    const remains = remainsArr.reduce((remains, remain) => {
+    return remainsArr.reduce((remains, remain) => {
       let outlet = this.model.outlets.filter((_outlet) => _outlet.id === remain.outlet_id)[0];
       if (!outlet || !remain.hasOwnProperty('available') && !remain.pickup) {
         return remains;
@@ -133,8 +133,6 @@ class MapController {
 
       return remains;
     }, {});
-
-    return remains;
   }
 
   pluckSize(size) {
