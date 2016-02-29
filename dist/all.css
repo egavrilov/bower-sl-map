@@ -160,9 +160,9 @@
   margin: 0;
   border-width: 1px;
   border-color: #e8e8e8;
-  background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 50% 50% no-repeat;
+  background: #fff url("/bower_components/sl-map/src/images/loupe.png") 50% 50% no-repeat;
 }
-.adress-popup .input:focus, .adress-popup .input.active {background: #fff url("http://scr.amik.am/sunlight_adress/images/loupe.png") 11px 50% no-repeat;}
+.adress-popup .input:focus, .adress-popup .input.active {background: #fff url("/bower_components/sl-map/src/images/loupe.png") 11px 50% no-repeat;}
 
 .adress-input-clear {
   width: 1em;
@@ -268,7 +268,7 @@
   padding: 0 0 0 21px;
   font-size: 15px;
   line-height: 20px;
-  background: url("http://scr.amik.am/sunlight_adress/images/map-icon.png") 2px 2px no-repeat;
+  background: url("/bower_components/sl-map/src/images/map-icon.png") 2px 2px no-repeat;
 }
 .adress-popup-time {
   color: #808080;
@@ -320,9 +320,9 @@
   position: absolute;
   width: 24px;
   height: 32px;
-  background: url("http://scr.amik.am/sunlight_adress/images/adress-mark.png") 0 0 no-repeat;
+  background: url("/bower_components/sl-map/src/images/adress-mark.png") 0 0 no-repeat;
 }
-.adress-mark.active {background: url("http://scr.amik.am/sunlight_adress/images/adress-mark-active.png") 0 0 no-repeat;}
+.adress-mark.active {background: url("/bower_components/sl-map/src/images/adress-mark-active.png") 0 0 no-repeat;}
 .adress-mark1 {
   top: 166px;
   left: 103px;
@@ -458,7 +458,7 @@
   padding: 0 0 0 25px;
   color: #808080;
   text-decoration: none;
-  background: url("http://scr.amik.am/sunlight_adress/images/form-mail-grey.png") 0 2px no-repeat;
+  background: url("/bower_components/sl-map/src/images/form-mail-grey.png") 0 2px no-repeat;
 }
 .min-popup-form {
   width: 236px;
@@ -479,9 +479,9 @@
   color: #000;
   border: 1px solid #f00;
 }
-.input-phone {background: url("http://scr.amik.am/sunlight_adress/images/form-phone.png") 11px 50% no-repeat;}
-.input-code {background: url("http://scr.amik.am/sunlight_adress/images/form-code.png") 11px 50% no-repeat;}
-.input-mail {background: url("http://scr.amik.am/sunlight_adress/images/form-mail.png") 11px 50% no-repeat;}
+.input-phone {background: url("/bower_components/sl-map/src/images/form-phone.png") 11px 50% no-repeat;}
+.input-code {background: url("/bower_components/sl-map/src/images/form-code.png") 11px 50% no-repeat;}
+.input-mail {background: url("/bower_components/sl-map/src/images/form-mail.png") 11px 50% no-repeat;}
 .min-popup .submit {
   font-size: 1.6em;
   letter-spacing: 1px;
