@@ -70,6 +70,27 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	/**
+	 * Show map and filter outlets by:
+	 *  - Action ID
+	 *  - By hand by UUID (comma separated)
+	 *  - Remains request results (/v1/reserves/product_remains/?product_article={Article}&region_id={UUID})
+	 *  - Selected product size (if remains)
+	 *  - Pawnshop type (comma separated)
+	 *
+	 * Special classes:
+	 *  .mapster - To remove 'Where to buy?' text
+	 *
+	 * Example
+	 * <div class="mapster"
+	 *    sl-map
+	 *    sl-map-action-id="403e9837-caad-11e3-a1d8-001018f04542"
+	 *    sl-map-action-outlets="c9271315-60ed-11e0-aec3-002219556026,7cb53d39-71c1-11e1-a9be-002219650662"
+	 *    sl-map-filter="[{available: true, count: 5, outlet_id: "b18ce8d6-02af-11e5-a78b-001018f04542", size: 0}]"
+	 *    sl-map-selected-size="15"
+	 *    sl-map-pawnshop-type="2, 3">
+	 */
+
 	var mapTpl = __webpack_require__(2);
 
 	var Map = function Map() {
@@ -198,12 +219,24 @@
 	      }
 
 	      if (this.pawnshopType) {
-	        this.outlets = this.outlets.filter(function (outlet) {
-	          return outlet.pawnshop >= _this3.pawnshopType;
-	        });
-	        this.model.outlets = this.model.outlets.filter(function (outlet) {
-	          return outlet.pawnshop >= _this3.pawnshopType;
-	        });
+	        (function () {
+	          var types = _this3.pawnshopType.split(',').map(function (type) {
+	            return Number(type.trim());
+	          });
+	          var outlets = [],
+	              modelOutlets = [];
+	          types.forEach(function (type) {
+	            outlets = outlets.concat(_this3.outlets.filter(function (outlet) {
+	              return outlet.pawnshop === type;
+	            }));
+	            modelOutlets = modelOutlets.concat(_this3.model.outlets.filter(function (outlet) {
+	              return outlet.pawnshop === type;
+	            }));
+	          });
+
+	          _this3.outlets = outlets;
+	          _this3.model.outlets = modelOutlets;
+	        })();
 	      }
 	    }
 	  }, {
