@@ -152,7 +152,7 @@
 	    key: 'setModel',
 	    value: function setModel(responses) {
 	      this.regions = this.Regions.all;
-	      this.outlets = responses.outlets.filter(function (outlet) {
+	      this.outlets = this.Outlets.all.filter(function (outlet) {
 	        return outlet.geo;
 	      });
 	      this.map = responses.map;

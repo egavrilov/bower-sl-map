@@ -543,7 +543,7 @@
   .adress-popup-left {
     position: relative;
     float: none;
-    width: auto;
+    width: 100%;
     height: auto;
     z-index: 10;
   }
