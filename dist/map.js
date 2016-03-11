@@ -198,13 +198,13 @@
 	      var _this3 = this;
 
 	      if (this.actionId && !this.actionOutlets) {
-	        this.$http('http://api.love.sl/v1/actions/actions/' + this.actionId).then(function (action) {
-	          var outlets = action.outlets;
+	        this.$http.get('http://api.love.sl/v1/actions/actions/' + this.actionId + '/').then(function (response) {
+	          var outlets = response.data.outlets;
 	          _this3.outlets = _this3.outlets.filter(function (_outlet) {
-	            return outlets.indexOf(_outlet) !== -1;
+	            return outlets.indexOf(_outlet.id) !== -1;
 	          });
 	          _this3.model.outlets = _this3.model.outlets.filter(function (_outlet) {
-	            return outlets.indexOf(_outlet) !== -1;
+	            return outlets.indexOf(_outlet.id) !== -1;
 	          });
 	        });
 	      }

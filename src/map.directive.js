@@ -110,10 +110,10 @@ class MapController {
 
   initFilters() {
     if (this.actionId && !this.actionOutlets) {
-      this.$http(`http://api.love.sl/v1/actions/actions/${this.actionId}`).then((action) => {
-        const outlets = action.outlets;
-        this.outlets = this.outlets.filter((_outlet) => outlets.indexOf(_outlet) !== -1);
-        this.model.outlets = this.model.outlets.filter((_outlet) => outlets.indexOf(_outlet) !== -1);
+      this.$http.get(`http://api.love.sl/v1/actions/actions/${this.actionId}/`).then((response) => {
+        const outlets = response.data.outlets;
+        this.outlets = this.outlets.filter((_outlet) => outlets.indexOf(_outlet.id) !== -1);
+        this.model.outlets = this.model.outlets.filter((_outlet) => outlets.indexOf(_outlet.id) !== -1);
       });
     }
 
