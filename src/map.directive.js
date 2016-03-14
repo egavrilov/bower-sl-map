@@ -220,7 +220,7 @@ class MapController {
       this.$timeout.cancel(this._resizeTimeout);
 
     this._resizeTimeout = this.$timeout(() => {
-      let outlets = this.model.outlets;
+      let outlets = this.outlets;
 
       if (this.outletsRemains) {
         outlets = this.remains && (this.remains[this.selectedSize] || this.remains[0]);
@@ -232,7 +232,7 @@ class MapController {
 
       let bounds = this.map.getBounds();
 
-      this.filtered = outlets.filter((outlet) =>
+      this.filtered = (outlets || []).filter((outlet) =>
         bounds.contains(this.gm('LatLng', outlet.geo[0], outlet.geo[1])));
 
       if (this.outletsFilter) {
